@@ -3,9 +3,9 @@
 // Company: 
 // Engineer: 
 // 
-// Create Date: 03.05.2020 15:02:13
+// Create Date: 03.05.2020 17:36:33
 // Design Name: 
-// Module Name: draw_background
+// Module Name: start_screen
 // Project Name: 
 // Target Devices: 
 // Tool Versions: 
@@ -20,12 +20,12 @@
 //////////////////////////////////////////////////////////////////////////////////
 
 
-
-module draw_background(
+module start_screen(
   input wire clk,
   input wire rst,
-  input wire color_select,
+  input wire module_en,
 
+  input wire [11:0] rgb_in,
   input wire [10:0] vcount_in,
   input wire vsync_in,
   input wire vblnk_in,
@@ -47,21 +47,18 @@ module draw_background(
   wire [10:0] hcount_out_nxt = hcount_in;
   wire hsync_out_nxt = hsync_in;
   wire hblnk_out_nxt = hblnk_in;
-    
+  
   reg [11:0] rgb_nxt;
   
-  localparam    COLOR_L = 12'hC_E_F, 
-                COLOR_D = 12'h2_6_E;
-
   always @*
     begin
-      // During blanking, make it it black.
-      if (vblnk_in || hblnk_in) rgb_nxt = 12'h0_0_0; 
+      if ( module_en == 0 ) rgb_nxt = rgb_in; 
       else
-        if( color_select == 0 ) rgb_nxt = COLOR_L;
-        else rgb_nxt = COLOR_D;
-      end
-    
+        if( (hcount_in > 100) && (hcount_in < 150) && (vcount_in > 100) && (vcount_in < 150) ) rgb_nxt = 12'h000;
+        else rgb_nxt = rgb_in; 
+      end  
+  
+
   always@(posedge clk)
     if (rst) begin
       rgb_out <=  0; 
@@ -80,5 +77,6 @@ module draw_background(
       hcount_out <= hcount_out_nxt;
       hsync_out <= hsync_out_nxt;
       hblnk_out <= hblnk_out_nxt;
-    end
+    end  
+  
 endmodule
