@@ -23,8 +23,8 @@
 module SkyHop(
   input wire rst,
   input wire clk,
-  input wire [1:0] sw,
-
+  input wire [3:0] sw,
+  output wire led,
   output wire vs,
   output wire hs,
   output wire [3:0] r,
@@ -46,6 +46,15 @@ module SkyHop(
   
   wire bg_clor_select = sw[0];
   wire start_screen_en = sw[1];
+  wire time_bar_en = sw[2];
+  wire time_bar_start = sw[3];
+  
+  wire one_ms_tick;
+  millisecond_timer my_millisecond_timer (
+    .clk_40MHz(clk_40MHz), 
+    .rst(rst),
+    .one_milli_tick(one_ms_tick)
+  );
   
   wire [10:0] vcount, hcount;
   wire vblnk, hblnk, vsync, hsync;
@@ -85,27 +94,53 @@ module SkyHop(
   );
   
   wire [10:0] vcount_ssc, hcount_ssc;
-  wire vblnk_ssc, hblnk_ssc;
+  wire vblnk_ssc, hblnk_ssc, vsync_ssc, hsync_ssc;
+  wire [11:0] rgb_ssc;
   
   start_screen my_start_screen (
     .module_en(start_screen_en),
-    .rgb_in(rgb_bg),
     .vcount_in(vcount_bg),
     .vsync_in(vsync_bg),
     .vblnk_in(vblnk_bg),
     .hcount_in(hcount_bg),
     .hsync_in(hsync_bg),
     .hblnk_in(hblnk_bg),
+    .rgb_in(rgb_bg),
     .vcount_out(vcount_ssc),
-    .vsync_out(vs),
+    .vsync_out(vsync_ssc),
     .vblnk_out(vblnk_ssc),
     .hcount_out(hcount_ssc),
-    .hsync_out(hs),
+    .hsync_out(hsync_ssc),
     .hblnk_out(hblnk_ssc),
-    .rgb_out({r,g,b}),
+    .rgb_out(rgb_ssc),
     .rst(rst),
     .clk(clk_40MHz)
   );
   
+  wire [10:0] vcount_tb, hcount_tb;
+  wire vblnk_tb, hblnk_tb, vsync_tb, hsync_tb;
+  
+  time_bar my_time_bar (
+    .module_en(time_bar_en),
+    .one_ms_tick(one_ms_tick),
+    .start(time_bar_start),
+    .vcount_in(vcount_ssc),
+    .vsync_in(vsync_ssc),
+    .vblnk_in(vblnk_ssc),
+    .hcount_in(hcount_ssc),
+    .hsync_in(hsync_ssc),
+    .hblnk_in(hblnk_ssc),
+    .rgb_in(rgb_ssc),
+    .vcount_out(vcount_tb),
+    .vsync_out(vs),
+    .vblnk_out(vblnk_tb),
+    .hcount_out(hcount_tb),
+    .hsync_out(hs),
+    .hblnk_out(hblnk_tb),
+    .rgb_out({r,g,b}),
+    .elapsed(led),
+    .rst(rst),
+    .clk(clk_40MHz)
+  );
   
 endmodule

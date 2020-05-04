@@ -25,13 +25,13 @@ module start_screen(
   input wire rst,
   input wire module_en,
 
-  input wire [11:0] rgb_in,
   input wire [10:0] vcount_in,
   input wire vsync_in,
   input wire vblnk_in,
   input wire [10:0] hcount_in,
   input wire hsync_in,
   input wire hblnk_in,
+  input wire [11:0] rgb_in,
   output reg [10:0] vcount_out,
   output reg vsync_out,
   output reg vblnk_out,
@@ -52,11 +52,14 @@ module start_screen(
   
   always @*
     begin
-      if ( module_en == 0 ) rgb_nxt = rgb_in; 
-      else
+      if ( module_en == 1 ) 
+      begin
         if( (hcount_in > 100) && (hcount_in < 150) && (vcount_in > 100) && (vcount_in < 150) ) rgb_nxt = 12'h000;
         else rgb_nxt = rgb_in; 
-      end  
+      end
+      else rgb_nxt = rgb_in; 
+    end  
+     
   
 
   always@(posedge clk)

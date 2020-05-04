@@ -50,8 +50,8 @@ module draw_background(
     
   reg [11:0] rgb_nxt;
   
-  localparam    COLOR_L = 12'hC_E_F, 
-                COLOR_D = 12'h2_6_E;
+  localparam COLOR_L = 12'h8_D_F; 
+  localparam COLOR_D = 12'h5_9_F;
 
   always @*
     begin
@@ -60,7 +60,7 @@ module draw_background(
       else
         if( color_select == 0 ) rgb_nxt = COLOR_L;
         else rgb_nxt = COLOR_D;
-      end
+    end
     
   always@(posedge clk)
     if (rst) begin

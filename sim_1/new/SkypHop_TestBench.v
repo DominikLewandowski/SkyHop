@@ -27,11 +27,20 @@ module SkypHop_TestBench();
   wire vs, hs;
   wire [3:0] r, g, b;
   
-  initial rst = 1'b0;
+  reg [2:0] sw;
+  wire led;
+  
+  initial
+  begin
+   rst = 1'b0;
+   sw = 3'b000;
+  end
 
   SkyHop mySkyHop (
     .rst(rst),
     .clk(clk),
+    .sw(sw),
+    .led(led),
     .vs(vs),
     .hs(hs),
     .r(r),
