@@ -1,4 +1,5 @@
 `timescale 1ns / 1ps
+`include "macros.vh"
 //////////////////////////////////////////////////////////////////////////////////
 // Company: 
 // Engineer: 
@@ -32,26 +33,16 @@ module draw_rect_char
   input wire clk,
   input wire rst,
   input wire text_en,
-
-  input wire [10:0] hcount_in,
-  input wire hsync_in,
-  input wire hblnk_in,
-  input wire [10:0] vcount_in,
-  input wire vsync_in,
-  input wire vblnk_in,
-  input wire [11:0] rgb_in,
   input wire [7:0] char_pixels,
-
-  output reg [10:0] hcount_out,
-  output reg hsync_out,
-  output reg hblnk_out,
-  output reg [10:0] vcount_out,
-  output reg vsync_out,
-  output reg vblnk_out,
-  output reg [11:0] rgb_out,
+  input wire [`VGA_BUS_SIZE-1:0] vga_bus_in,
+  output wire [`VGA_BUS_SIZE-1:0] vga_bus_out,
   output reg [7:0] char_xy,
   output reg [3:0] char_line
 );
+
+  `VGA_BUS_SPLIT( vga_bus_in )
+  `DEFINE_VGA_OUT_REG
+  `VGA_BUS_MERGE( vga_bus_out )
   
   wire [10:0] hcount_out_nxt, vcount_out_nxt;
   wire hsync_out_nxt, vsync_out_nxt, hblnk_out_nxt, vblnk_out_nxt;

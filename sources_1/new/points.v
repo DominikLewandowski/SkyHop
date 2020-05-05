@@ -1,4 +1,5 @@
 `timescale 1ns / 1ps
+`include "macros.vh"
 //////////////////////////////////////////////////////////////////////////////////
 // Company: 
 // Engineer: 
@@ -26,20 +27,8 @@ module points(
   input wire module_en,
   input wire increase,
 
-  input wire [10:0] vcount_in,
-  input wire vsync_in,
-  input wire vblnk_in,
-  input wire [10:0] hcount_in,
-  input wire hsync_in,
-  input wire hblnk_in,
-  input wire [11:0] rgb_in,
-  output wire [10:0] vcount_out,
-  output wire vsync_out,
-  output wire vblnk_out,
-  output wire [10:0] hcount_out,
-  output wire hsync_out,
-  output wire hblnk_out,
-  output wire [11:0] rgb_out
+  input wire [`VGA_BUS_SIZE-1:0] vga_bus_in,
+  output wire [`VGA_BUS_SIZE-1:0] vga_bus_out
   );
   
   wire [3:0] char_line;
@@ -55,21 +44,9 @@ module points(
     .TEXT_SIZE_Y(1)
   ) my_draw_rect_char (
     .text_en(module_en),
-    .hcount_in(hcount_in),
-    .hsync_in(hsync_in),
-    .hblnk_in(hblnk_in),
-    .vcount_in(vcount_in),
-    .vsync_in(vsync_in),
-    .vblnk_in(vblnk_in),
-    .rgb_in(rgb_in),
+    .vga_bus_in(vga_bus_in),
     .char_pixels(char_line_pixels),
-    .hcount_out(hcount_out),
-    .hsync_out(hsync_out),
-    .hblnk_out(hblnk_out),
-    .vcount_out(vcount_out),
-    .vsync_out(vsync_out),
-    .vblnk_out(vblnk_out),
-    .rgb_out(rgb_out),
+    .vga_bus_out(vga_bus_out),
     .char_xy(char_xy),
     .char_line(char_line),
     .clk(clk),

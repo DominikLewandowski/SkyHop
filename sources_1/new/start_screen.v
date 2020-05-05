@@ -1,4 +1,5 @@
 `timescale 1ns / 1ps
+`include "macros.vh"
 //////////////////////////////////////////////////////////////////////////////////
 // Company: 
 // Engineer: 
@@ -25,28 +26,20 @@ module start_screen(
   input wire rst,
   input wire module_en,
 
-  input wire [10:0] vcount_in,
-  input wire vsync_in,
-  input wire vblnk_in,
-  input wire [10:0] hcount_in,
-  input wire hsync_in,
-  input wire hblnk_in,
-  input wire [11:0] rgb_in,
-  output reg [10:0] vcount_out,
-  output reg vsync_out,
-  output reg vblnk_out,
-  output reg [10:0] hcount_out,
-  output reg hsync_out,
-  output reg hblnk_out,
-  output reg [11:0] rgb_out
+  input wire [`VGA_BUS_SIZE-1:0] vga_bus_in,
+  output wire [`VGA_BUS_SIZE-1:0] vga_bus_out
   );
   
-  wire [10:0] vcount_out_nxt = vcount_in;
-  wire vsync_out_nxt = vsync_in;
-  wire vblnk_out_nxt = vblnk_in;
+  `VGA_BUS_SPLIT( vga_bus_in )
+  `DEFINE_VGA_OUT_REG
+  `VGA_BUS_MERGE( vga_bus_out )
+  
   wire [10:0] hcount_out_nxt = hcount_in;
   wire hsync_out_nxt = hsync_in;
   wire hblnk_out_nxt = hblnk_in;
+  wire [10:0] vcount_out_nxt = vcount_in;
+  wire vsync_out_nxt = vsync_in;
+  wire vblnk_out_nxt = vblnk_in;
   
   reg [11:0] rgb_nxt;
   
@@ -59,27 +52,25 @@ module start_screen(
       end
       else rgb_nxt = rgb_in; 
     end  
-     
-  
 
   always@(posedge clk)
     if (rst) begin
-      rgb_out <=  0; 
-      vcount_out <=  0; 
-      vsync_out <=  0;
-      vblnk_out <=  0;
       hcount_out <= 0;
       hsync_out <=  0;
       hblnk_out <=  0;
+      vcount_out <=  0; 
+      vsync_out <=  0;
+      vblnk_out <=  0;
+      rgb_out <=  0; 
     end
     else begin
-      rgb_out <= rgb_nxt;
+      hcount_out <= hcount_out_nxt;
+      hsync_out <= hsync_out_nxt;
+      hblnk_out <= hblnk_out_nxt;      
       vcount_out <= vcount_out_nxt; 
       vsync_out <= vsync_out_nxt;
       vblnk_out <= vblnk_out_nxt;
-      hcount_out <= hcount_out_nxt;
-      hsync_out <= hsync_out_nxt;
-      hblnk_out <= hblnk_out_nxt;
+      rgb_out <= rgb_nxt;
     end  
   
 endmodule

@@ -1,4 +1,5 @@
 `timescale 1ns / 1ps
+`include "macros.vh"
 //////////////////////////////////////////////////////////////////////////////////
 // Company: 
 // Engineer: 
@@ -71,9 +72,7 @@ module SkyHop(
     .rst(rst)
   );
   
-  wire [10:0] vcount_bg, hcount_bg;
-  wire vblnk_bg, hblnk_bg, vsync_bg, hsync_bg;
-  wire [11:0] rgb_bg;
+  wire [`VGA_BUS_SIZE-1:0] vga_bus [3:0];
   
   draw_background my_draw_background (
     .color_select(bg_clor_select),
@@ -83,91 +82,42 @@ module SkyHop(
     .hcount_in(hcount),
     .hsync_in(hsync),
     .hblnk_in(hblnk),
-    .vcount_out(vcount_bg),
-    .vsync_out(vsync_bg),
-    .vblnk_out(vblnk_bg),
-    .hcount_out(hcount_bg),
-    .hsync_out(hsync_bg),
-    .hblnk_out(hblnk_bg),
-    .rgb_out(rgb_bg),
+    .vga_bus_out(vga_bus[0]),
     .rst(rst),
     .clk(clk_40MHz)
   );
-  
-  wire [10:0] vcount_ssc, hcount_ssc;
-  wire vblnk_ssc, hblnk_ssc, vsync_ssc, hsync_ssc;
-  wire [11:0] rgb_ssc;
   
   start_screen my_start_screen (
     .module_en(start_screen_en),
-    .vcount_in(vcount_bg),
-    .vsync_in(vsync_bg),
-    .vblnk_in(vblnk_bg),
-    .hcount_in(hcount_bg),
-    .hsync_in(hsync_bg),
-    .hblnk_in(hblnk_bg),
-    .rgb_in(rgb_bg),
-    .vcount_out(vcount_ssc),
-    .vsync_out(vsync_ssc),
-    .vblnk_out(vblnk_ssc),
-    .hcount_out(hcount_ssc),
-    .hsync_out(hsync_ssc),
-    .hblnk_out(hblnk_ssc),
-    .rgb_out(rgb_ssc),
+    .vga_bus_in(vga_bus[0]),
+    .vga_bus_out(vga_bus[1]),
     .rst(rst),
     .clk(clk_40MHz)
   );
-  
-  wire [10:0] vcount_tb, hcount_tb;
-  wire vblnk_tb, hblnk_tb, vsync_tb, hsync_tb;
-  wire [11:0] rgb_tb;
   
   time_bar my_time_bar (
     .module_en(time_bar_en),
     .one_ms_tick(one_ms_tick),
     .start(time_bar_start),
-    .vcount_in(vcount_ssc),
-    .vsync_in(vsync_ssc),
-    .vblnk_in(vblnk_ssc),
-    .hcount_in(hcount_ssc),
-    .hsync_in(hsync_ssc),
-    .hblnk_in(hblnk_ssc),
-    .rgb_in(rgb_ssc),
-    .vcount_out(vcount_tb),
-    .vsync_out(vsync_tb),
-    .vblnk_out(vblnk_tb),
-    .hcount_out(hcount_tb),
-    .hsync_out(hsync_tb),
-    .hblnk_out(hblnk_tb),
-    .rgb_out(rgb_tb),
+    .vga_bus_in(vga_bus[1]),
+    .vga_bus_out(vga_bus[2]),
     .elapsed(led),
     .rst(rst),
     .clk(clk_40MHz)
   );
   
-  wire [10:0] vcount_points, hcount_points;
-  wire vblnk_points, hblnk_points, vsync_points, hsync_points;
-  wire [11:0] rgb_points;
-  
   points my_points (
     .module_en(points_en),
     .increase(1'b0),
-    .vcount_in(vcount_tb),
-    .vsync_in(vsync_tb),
-    .vblnk_in(vblnk_tb),
-    .hcount_in(hcount_tb),
-    .hsync_in(hsync_tb),
-    .hblnk_in(hblnk_tb),
-    .rgb_in(rgb_tb),
-    .vcount_out(vcount_points),
-    .vsync_out(vs),
-    .vblnk_out(vblnk_points),
-    .hcount_out(hcount_points),
-    .hsync_out(hs),
-    .hblnk_out(hblnk_points),
-    .rgb_out({r,g,b}),
+    .vga_bus_in(vga_bus[2]),
+    .vga_bus_out(vga_bus[3]),
     .rst(rst),
     .clk(clk_40MHz)
   );
   
+  assign hs = vga_bus[3][`VGA_HSYNC_BIT];
+  assign vs = vga_bus[3][`VGA_VSYNC_BIT];
+  assign {r,g,b} = vga_bus[3][`VGA_RGB_BIT];
+  
 endmodule
+
