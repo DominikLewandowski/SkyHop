@@ -41,7 +41,7 @@ module draw_rect_char
 );
 
   `VGA_BUS_SPLIT( vga_bus_in )
-  `DEFINE_VGA_OUT_REG
+  `VGA_DEFINE_OUT_REG
   `VGA_BUS_MERGE( vga_bus_out )
   
   wire [10:0] hcount_out_nxt, vcount_out_nxt;

@@ -24,7 +24,8 @@
 module SkyHop(
   input wire rst,
   input wire clk,
-  input wire [4:0] sw,
+  input wire [6:0] sw,
+  input wire btnU,
   output wire led,
   output wire vs,
   output wire hs,
@@ -45,11 +46,15 @@ module SkyHop(
     .clk(clk)                // Clock in ports
   );
   
+  wire time_bar_start = btnU;
+  
   wire bg_clor_select = sw[0];
   wire start_screen_en = sw[1];
-  wire time_bar_en = sw[2];
-  wire time_bar_start = sw[3];
-  wire points_en = sw[4];
+  wire blocks_en = sw[2];
+  wire time_bar_en = sw[3];
+  wire character_en = sw[4];
+  wire points_en = sw[5];
+  wire end_screen_en = sw[6];
   
   wire one_ms_tick;
   millisecond_timer my_millisecond_timer (
@@ -72,7 +77,7 @@ module SkyHop(
     .rst(rst)
   );
   
-  wire [`VGA_BUS_SIZE-1:0] vga_bus [3:0];
+  wire [`VGA_BUS_SIZE-1:0] vga_bus [6:0];
   
   draw_background my_draw_background (
     .color_select(bg_clor_select),
@@ -95,13 +100,29 @@ module SkyHop(
     .clk(clk_40MHz)
   );
   
+  blocks my_blocks (
+    .module_en(blocks_en),
+    .vga_bus_in(vga_bus[1]),
+    .vga_bus_out(vga_bus[2]),
+    .rst(rst),
+    .clk(clk_40MHz)
+  );
+  
   time_bar my_time_bar (
     .module_en(time_bar_en),
     .one_ms_tick(one_ms_tick),
     .start(time_bar_start),
-    .vga_bus_in(vga_bus[1]),
-    .vga_bus_out(vga_bus[2]),
+    .vga_bus_in(vga_bus[2]),
+    .vga_bus_out(vga_bus[3]),
     .elapsed(led),
+    .rst(rst),
+    .clk(clk_40MHz)
+  );
+  
+  character my_character (
+    .module_en(character_en),
+    .vga_bus_in(vga_bus[3]),
+    .vga_bus_out(vga_bus[4]),
     .rst(rst),
     .clk(clk_40MHz)
   );
@@ -109,15 +130,23 @@ module SkyHop(
   points my_points (
     .module_en(points_en),
     .increase(1'b0),
-    .vga_bus_in(vga_bus[2]),
-    .vga_bus_out(vga_bus[3]),
+    .vga_bus_in(vga_bus[4]),
+    .vga_bus_out(vga_bus[5]),
     .rst(rst),
     .clk(clk_40MHz)
   );
   
-  assign hs = vga_bus[3][`VGA_HSYNC_BIT];
-  assign vs = vga_bus[3][`VGA_VSYNC_BIT];
-  assign {r,g,b} = vga_bus[3][`VGA_RGB_BIT];
+  end_screen my_end_screen (
+    .module_en(end_screen_en),
+    .vga_bus_in(vga_bus[5]),
+    .vga_bus_out(vga_bus[6]),
+    .rst(rst),
+    .clk(clk_40MHz)
+  );
+  
+  assign hs = vga_bus[6][`VGA_HSYNC_BIT];
+  assign vs = vga_bus[6][`VGA_VSYNC_BIT];
+  assign {r,g,b} = vga_bus[6][`VGA_RGB_BIT];
   
 endmodule
 

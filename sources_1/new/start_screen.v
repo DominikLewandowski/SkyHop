@@ -31,7 +31,7 @@ module start_screen(
   );
   
   `VGA_BUS_SPLIT( vga_bus_in )
-  `DEFINE_VGA_OUT_REG
+  `VGA_DEFINE_OUT_REG
   `VGA_BUS_MERGE( vga_bus_out )
   
   wire [10:0] hcount_out_nxt = hcount_in;
@@ -41,16 +41,16 @@ module start_screen(
   wire vsync_out_nxt = vsync_in;
   wire vblnk_out_nxt = vblnk_in;
   
-  reg [11:0] rgb_nxt;
+  reg [11:0] rgb_out_nxt;
   
   always @*
     begin
       if ( module_en == 1 ) 
       begin
-        if( (hcount_in > 100) && (hcount_in < 150) && (vcount_in > 100) && (vcount_in < 150) ) rgb_nxt = 12'h000;
-        else rgb_nxt = rgb_in; 
+        if( (hcount_in > 100) && (hcount_in < 150) && (vcount_in > 100) && (vcount_in < 150) ) rgb_out_nxt = 12'h000;
+        else rgb_out_nxt = rgb_in; 
       end
-      else rgb_nxt = rgb_in; 
+      else rgb_out_nxt = rgb_in; 
     end  
 
   always@(posedge clk)
@@ -70,7 +70,7 @@ module start_screen(
       vcount_out <= vcount_out_nxt; 
       vsync_out <= vsync_out_nxt;
       vblnk_out <= vblnk_out_nxt;
-      rgb_out <= rgb_nxt;
+      rgb_out <= rgb_out_nxt;
     end  
   
 endmodule

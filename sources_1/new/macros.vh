@@ -18,7 +18,7 @@
   wire vblnk_in = BUS_NAME[`VGA_VBLNK_BIT]; \
   wire [11:0] rgb_in = BUS_NAME[`VGA_RGB_BIT];
     
-`define DEFINE_VGA_OUT_REG \
+`define VGA_DEFINE_OUT_REG \
     reg [10:0] hcount_out; \
     reg hsync_out; \
     reg hblnk_out; \
