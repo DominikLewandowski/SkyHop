@@ -38,7 +38,7 @@ module delay
 
 //------------------------------------------------------------------------------
 // The first delay stage
-  always @(posedge clk or posedge rst)
+  always @(posedge clk)
   begin:delay_stage_0
     if(rst)
         del_mem[0] <= 0;

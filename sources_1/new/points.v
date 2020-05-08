@@ -119,19 +119,19 @@ module points(
       default: char_code = 7'h00;
     endcase
     
-  always@(posedge clk or posedge rst)
+  always@(posedge clk)
   begin
     if(rst)
       begin
-        one_cnt = 0;
-        ten_cnt = 0;
-        hundred_cnt = 0;
+        one_cnt <= 0;
+        ten_cnt <= 0;
+        hundred_cnt <= 0;
       end
     else
       begin
-        one_cnt = one_cnt_nxt;
-        ten_cnt = ten_cnt_nxt;
-        hundred_cnt = hundred_cnt_nxt;
+        one_cnt <= one_cnt_nxt;
+        ten_cnt <= ten_cnt_nxt;
+        hundred_cnt <= hundred_cnt_nxt;
       end
   end 
 endmodule

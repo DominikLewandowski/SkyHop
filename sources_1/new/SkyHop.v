@@ -25,7 +25,7 @@ module SkyHop(
   input wire rst,
   input wire clk,
   input wire [6:0] sw,
-  input wire btnU,
+  input wire btnU, btnD, btnL, btnR,
   output wire led,
   output wire vs,
   output wire hs,
@@ -46,7 +46,17 @@ module SkyHop(
     .clk(clk)                // Clock in ports
   );
   
-  wire time_bar_start = btnU;
+  // -------------  For test only  ------------------------------------------------------- //
+  wire btnU_tick, btnL_tick, btnR_tick, btnD_tick;
+  btn_debounce my_db_1( .clk(clk_40MHz), .reset(rst), .sw(btnU), .db_level(), .db_tick(btnU_tick));
+  btn_debounce my_db_2( .clk(clk_40MHz), .reset(rst), .sw(btnL), .db_level(), .db_tick(btnL_tick));
+  btn_debounce my_db_3( .clk(clk_40MHz), .reset(rst), .sw(btnR), .db_level(), .db_tick(btnR_tick));
+  btn_debounce my_db_4( .clk(clk_40MHz), .reset(rst), .sw(btnD), .db_level(), .db_tick(btnD_tick));
+  
+  wire time_bar_start = btnU_tick;
+  wire jump_left = btnL_tick;
+  wire jump_right = btnR_tick;
+  wire point_inc = btnD_tick;
   
   wire bg_clor_select = sw[0];
   wire start_screen_en = sw[1];
@@ -55,6 +65,7 @@ module SkyHop(
   wire character_en = sw[4];
   wire points_en = sw[5];
   wire end_screen_en = sw[6];
+  // ------------------------------------------------------------------------------------ //
   
   wire one_ms_tick;
   millisecond_timer my_millisecond_timer (
@@ -121,6 +132,8 @@ module SkyHop(
   
   character my_character (
     .module_en(character_en),
+    .jump_left(btnL_tick),
+    .jump_right(btnR_tick),
     .vga_bus_in(vga_bus[3]),
     .vga_bus_out(vga_bus[4]),
     .rst(rst),
@@ -129,7 +142,7 @@ module SkyHop(
   
   points my_points (
     .module_en(points_en),
-    .increase(1'b0),
+    .increase(point_inc),
     .vga_bus_in(vga_bus[4]),
     .vga_bus_out(vga_bus[5]),
     .rst(rst),

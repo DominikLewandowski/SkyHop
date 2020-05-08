@@ -45,7 +45,7 @@ module draw_rect_char
   `VGA_BUS_MERGE( vga_bus_out )
   
   wire [10:0] hcount_out_nxt, vcount_out_nxt;
-  wire hsync_out_nxt, vsync_out_nxt, hblnk_out_nxt, vblnk_out_nxt;
+  wire hsync_out_nxt, vsync_out_nxt; 
   reg [11:0] rgb_out_nxt;
   wire [11:0] rgb_delayed;
   
@@ -70,13 +70,13 @@ module draw_rect_char
                          (offset_hcount_out[2:0] == 3'b110) ? 8'b0000_0010: 8'b0000_0001;
 
   delay #(
-      .WIDTH (38),
+      .WIDTH (36),
       .CLK_DEL(2)
   ) u_delay (
       .clk (clk),
       .rst (rst),
-      .din ( {hcount_in, hsync_in, hblnk_in, vcount_in, vsync_in, vblnk_in, rgb_in}),
-      .dout ({hcount_out_nxt, hsync_out_nxt, hblnk_out_nxt, vcount_out_nxt, vsync_out_nxt, vblnk_out_nxt, rgb_delayed})
+      .din ( {hcount_in, hsync_in, vcount_in, vsync_in, rgb_in}),
+      .dout ({hcount_out_nxt, hsync_out_nxt, vcount_out_nxt, vsync_out_nxt, rgb_delayed})
   );
   
   always@*
@@ -97,11 +97,11 @@ module draw_rect_char
     if(rst) 
       begin
       hcount_out <= 0;
-      hsync_out <= 0;
-      hblnk_out <= 0;
       vcount_out <= 0;
+      hsync_out <= 0;
       vsync_out <= 0;
-      vblnk_out <= 0;
+      //hblnk_out <= 0;
+      //vblnk_out <= 0;
       rgb_out <= 0;
       char_xy <= 0;
       char_line <= 0;
@@ -109,14 +109,13 @@ module draw_rect_char
     else 
       begin
       hcount_out <= hcount_out_nxt;
-      hsync_out <= hsync_out_nxt;
-      hblnk_out <= hblnk_out_nxt;
       vcount_out <= vcount_out_nxt;
+      hsync_out <= hsync_out_nxt;
       vsync_out <= vsync_out_nxt;
-      vblnk_out <= vblnk_out_nxt;
+      //hblnk_out <= hblnk_out_nxt;c
+      //vblnk_out <= vblnk_out_nxt;
       rgb_out <= rgb_out_nxt;
       char_xy <= char_xy_nxt;
       char_line <= char_line_nxt;
       end
 endmodule
-

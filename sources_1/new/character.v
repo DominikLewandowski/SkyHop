@@ -25,51 +25,51 @@ module character(
   input wire clk,
   input wire rst,
   input wire module_en,
+  input wire jump_left,
+  input wire jump_right,
 
   input wire [`VGA_BUS_SIZE-1:0] vga_bus_in,
   output wire [`VGA_BUS_SIZE-1:0] vga_bus_out
   );
-
-  `VGA_BUS_SPLIT( vga_bus_in )
-  `VGA_DEFINE_OUT_REG
-  `VGA_BUS_MERGE( vga_bus_out )
-
-  wire [10:0] hcount_out_nxt = hcount_in;
-  wire hsync_out_nxt = hsync_in;
-  wire hblnk_out_nxt = hblnk_in;
-  wire [10:0] vcount_out_nxt = vcount_in;
-  wire vsync_out_nxt = vsync_in;
-  wire vblnk_out_nxt = vblnk_in;
   
-  reg [11:0] rgb_out_nxt;
+  reg [8:0] character_x, character_x_nxt;       // <0:799>
+  reg [8:0] character_y, character_y_nxt;       // <0:599>
+  reg [3:0] character_pos, character_pos_nxt;   // <0:8>
+  
+  localparam CHARACTER_COLOR = 12'h0F0;
+  
+  draw_rect #(
+    .RECT_COLOUR(CHARACTER_COLOR),
+    .RECT_WIDTH(80),
+    .RECT_HEIGHT(80)
+  ) my_draw_rect (
+    .module_en(module_en),
+    .xpos(character_x),
+    .ypos(character_y),
+    .vga_bus_in(vga_bus_in),
+    .vga_bus_out(vga_bus_out),   
+    .pclk(clk),
+    .rst(rst)
+  );
   
   always @*
   begin
-    if ( module_en == 1 ) 
-    begin
-      if( (hcount_in > 300) && (hcount_in < 450) && (vcount_in > 400) && (vcount_in < 450) ) rgb_out_nxt = 12'h000;
-      else rgb_out_nxt = rgb_in; 
-    end
-    else rgb_out_nxt = rgb_in; 
+    character_y_nxt = 500;
+    if(jump_left == 1) character_x_nxt = 200;
+    else if(jump_right == 1) character_x_nxt = 400;
+    else character_x_nxt = character_x;
+    
   end    
 
   always@(posedge clk)
     if (rst) begin
-      hcount_out <= 0;
-      hsync_out <=  0;
-      hblnk_out <=  0;
-      vcount_out <=  0; 
-      vsync_out <=  0;
-      vblnk_out <=  0;
-      rgb_out <=  0; 
+      character_x <= 0;
+      character_y <= 0;
+      character_pos <= 0;
     end
     else begin
-      hcount_out <= hcount_out_nxt;
-      hsync_out <= hsync_out_nxt;
-      hblnk_out <= hblnk_out_nxt;      
-      vcount_out <= vcount_out_nxt; 
-      vsync_out <= vsync_out_nxt;
-      vblnk_out <= vblnk_out_nxt;
-      rgb_out <= rgb_out_nxt;
+      character_x <= character_x_nxt;
+      character_y <= character_y_nxt;
+      character_pos <= character_pos_nxt;
     end    
 endmodule

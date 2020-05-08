@@ -48,11 +48,11 @@ module time_bar(
   `VGA_BUS_MERGE( vga_bus_out )
   
   wire [10:0] hcount_out_nxt = hcount_in;
-  wire hsync_out_nxt = hsync_in;
-  wire hblnk_out_nxt = hblnk_in;
   wire [10:0] vcount_out_nxt = vcount_in;
+  wire hsync_out_nxt = hsync_in;
   wire vsync_out_nxt = vsync_in;
-  wire vblnk_out_nxt = vblnk_in;
+  //wire hblnk_out_nxt = hblnk_in;
+  //wire vblnk_out_nxt = vblnk_in;
   reg [11:0] rgb_out_nxt;
   reg elapsed_nxt;
   
@@ -71,12 +71,12 @@ module time_bar(
   
   always@(posedge clk)
     if (rst) begin
-      vcount_out <=  0; 
-      vsync_out <=  0;
-      vblnk_out <=  0;
       hcount_out <= 0;
+      vcount_out <=  0; 
       hsync_out <=  0;
-      hblnk_out <=  0;
+      vsync_out <=  0;
+      //vblnk_out <=  0;
+      //hblnk_out <=  0;
       time_counter <= 0;
       pixel_counter <= 0;
       rgb_out <=  0;
@@ -85,11 +85,11 @@ module time_bar(
     end
     else begin
       hcount_out <= hcount_out_nxt;
-      hsync_out <= hsync_out_nxt;
-      hblnk_out <= hblnk_out_nxt;
       vcount_out <= vcount_out_nxt; 
+      hsync_out <= hsync_out_nxt;
       vsync_out <= vsync_out_nxt;
-      vblnk_out <= vblnk_out_nxt;
+      //hblnk_out <= hblnk_out_nxt;
+      //vblnk_out <= vblnk_out_nxt;
       rgb_out <= rgb_out_nxt;
       time_counter <= time_counter_nxt;
       pixel_counter <= pixel_counter_nxt;
