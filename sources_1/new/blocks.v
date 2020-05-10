@@ -25,6 +25,8 @@ module blocks(
   input wire clk,
   input wire rst,
   input wire module_en,
+  input wire jump_left,
+  input wire jump_right,
   
   input wire [`VGA_BUS_SIZE-1:0] vga_bus_in,
   output wire [`VGA_BUS_SIZE-1:0] vga_bus_out
@@ -38,20 +40,17 @@ module blocks(
   wire [10:0] vcount_out_nxt = vcount_in;
   wire hsync_out_nxt = hsync_in;
   wire vsync_out_nxt = vsync_in;
-  //wire hblnk_out_nxt = hblnk_in;
-  //wire vblnk_out_nxt = vblnk_in;
-  
   reg [11:0] rgb_out_nxt;
   
-  always @*
+  always@*
   begin
     if ( module_en == 1 ) 
     begin
-      if( (hcount_in > 300) && (hcount_in < 450) && (vcount_in > 100) && (vcount_in < 150) ) rgb_out_nxt = 12'h000;
+      if( (hcount_in > 100) && (hcount_in < 150) && (vcount_in > 100) && (vcount_in < 150) ) rgb_out_nxt = 12'h000;
       else rgb_out_nxt = rgb_in; 
     end
-    else rgb_out_nxt = rgb_in; 
-  end   
+    else rgb_out_nxt = rgb_in;
+  end
   
   always@(posedge clk)
     if (rst) begin
@@ -59,8 +58,6 @@ module blocks(
       vcount_out <=  0; 
       hsync_out <=  0;
       vsync_out <=  0;
-      //hblnk_out <=  0;
-      //vblnk_out <=  0;
       rgb_out <=  0; 
     end
     else begin
@@ -68,9 +65,8 @@ module blocks(
       vcount_out <= vcount_out_nxt; 
       hsync_out <= hsync_out_nxt;
       vsync_out <= vsync_out_nxt;
-      //hblnk_out <= hblnk_out_nxt;      
-      //vblnk_out <= vblnk_out_nxt;
       rgb_out <= rgb_out_nxt;
-    end    
+    end
+
   
 endmodule

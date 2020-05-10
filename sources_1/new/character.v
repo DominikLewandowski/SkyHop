@@ -27,21 +27,28 @@ module character(
   input wire module_en,
   input wire jump_left,
   input wire jump_right,
+  input wire one_ms_tick,
+  output reg landed,
 
   input wire [`VGA_BUS_SIZE-1:0] vga_bus_in,
   output wire [`VGA_BUS_SIZE-1:0] vga_bus_out
   );
   
-  reg [8:0] character_x, character_x_nxt;       // <0:799>
-  reg [8:0] character_y, character_y_nxt;       // <0:599>
-  reg [3:0] character_pos, character_pos_nxt;   // <0:8>
+  reg [9:0] character_x, character_x_nxt;       // <0:799>
+  reg [9:0] character_y, character_y_nxt;       // <0:599>
   
-  localparam CHARACTER_COLOR = 12'h0F0;
+  reg landed_nxt;
+  
+  localparam CHARACTER_COLOR = 12'hFF0;
+  localparam CHARACTER_HEIGHT = 60;
+  localparam CHARACTER_WIDTH = 60;
+  localparam GAME_WIDTH = 800;
+  
   
   draw_rect #(
     .RECT_COLOUR(CHARACTER_COLOR),
-    .RECT_WIDTH(80),
-    .RECT_HEIGHT(80)
+    .RECT_WIDTH(CHARACTER_WIDTH),
+    .RECT_HEIGHT(CHARACTER_HEIGHT)
   ) my_draw_rect (
     .module_en(module_en),
     .xpos(character_x),
@@ -52,24 +59,81 @@ module character(
     .rst(rst)
   );
   
+  reg [1:0] state, state_nxt;
+  localparam S_IDLE = 2'b00;
+  localparam S_JUMP_R = 2'b01;
+  localparam S_JUMP_L = 2'b10;
+  
+  reg [6:0] one_ms_timer, one_ms_timer_nxt;
+  
   always @*
   begin
+    state_nxt = state;
     character_y_nxt = 500;
-    if(jump_left == 1) character_x_nxt = 200;
-    else if(jump_right == 1) character_x_nxt = 400;
-    else character_x_nxt = character_x;
+    character_x_nxt = character_x;
+    one_ms_timer_nxt = one_ms_timer;
+    landed_nxt = 0;
     
+    case(state)
+    
+      S_IDLE:
+        if( jump_left == 1 ) 
+          begin 
+            state_nxt = S_JUMP_L;
+            one_ms_timer_nxt = 0;
+          end
+        else if( jump_right == 1 ) 
+          begin
+            state_nxt = S_JUMP_R;
+            one_ms_timer_nxt = 0;
+          end
+        else state_nxt = state;
+        
+      S_JUMP_R:
+        begin 
+          if( one_ms_tick == 1 )
+            begin
+              character_x_nxt = character_x + 1;
+              if( one_ms_timer < 79 ) one_ms_timer_nxt = one_ms_timer + 1;
+              else 
+                begin
+                  landed_nxt = 1;
+                  state_nxt = S_IDLE;
+                end
+            end  
+        end
+        
+      S_JUMP_L:
+        begin 
+          if( one_ms_tick == 1 )
+            begin
+              character_x_nxt = character_x - 1;
+              if( one_ms_timer < 79 ) one_ms_timer_nxt = one_ms_timer + 1;
+              else 
+                begin
+                  landed_nxt = 1;
+                  state_nxt = S_IDLE;
+                end
+            end  
+        end
+        
+      default: state_nxt = S_IDLE;
+    endcase
   end    
 
   always@(posedge clk)
     if (rst) begin
-      character_x <= 0;
+      character_x <= (GAME_WIDTH/2)-(CHARACTER_WIDTH/2)-1;
       character_y <= 0;
-      character_pos <= 0;
+      state <= S_IDLE;
+      landed <= 0;
+      one_ms_timer <= 0;
     end
     else begin
       character_x <= character_x_nxt;
       character_y <= character_y_nxt;
-      character_pos <= character_pos_nxt;
+      state <= state_nxt;
+      landed <= landed_nxt;
+      one_ms_timer <= one_ms_timer_nxt;
     end    
 endmodule

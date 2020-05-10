@@ -34,9 +34,6 @@ module draw_background(
   output wire [`VGA_BUS_SIZE-1:0] vga_bus_out
   );
   
-  localparam COLOR_L = 12'h8_D_F; 
-  localparam COLOR_D = 12'h5_9_F;
-  
   `VGA_DEFINE_OUT_REG
   `VGA_BUS_MERGE( vga_bus_out )
   
@@ -44,16 +41,14 @@ module draw_background(
   wire [10:0] vcount_out_nxt = vcount_in;
   wire hsync_out_nxt = hsync_in;
   wire vsync_out_nxt = vsync_in;
-  //wire hblnk_out_nxt = hblnk_in;
-  //wire vblnk_out_nxt = vblnk_in;
   
   reg [11:0] rgb_out_nxt;
 
   always @*
     begin
       if (vblnk_in || hblnk_in) rgb_out_nxt = 12'h000; 
-      else if( color_select == 0 ) rgb_out_nxt = COLOR_L;
-      else rgb_out_nxt = COLOR_D;
+      else if( color_select == 0 ) rgb_out_nxt = `BG_COLOR_L;
+      else rgb_out_nxt = `BG_COLOR_D;
     end
     
   always@(posedge clk)
@@ -62,8 +57,6 @@ module draw_background(
       vcount_out <= 0;
       hsync_out <=  0;
       vsync_out <=  0;
-      //hblnk_out <=  0;
-      //vblnk_out <=  0;
       rgb_out <=  0; 
     end
     else begin
@@ -71,8 +64,6 @@ module draw_background(
       vcount_out <= vcount_out_nxt;
       hsync_out <= hsync_out_nxt;
       vsync_out <= vsync_out_nxt;
-      //hblnk_out <= hblnk_out_nxt;
-      //vblnk_out <= vblnk_out_nxt;
       rgb_out <= rgb_out_nxt;
     end
 endmodule

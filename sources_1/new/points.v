@@ -38,6 +38,7 @@ module points(
   
   draw_rect_char #(
     .TEXT_COLOUR(12'hFFF),
+    .FONT_SIZE(1),
     .TEXT_POS_X(50),
     .TEXT_POS_Y(50),
     .TEXT_SIZE_X(10),

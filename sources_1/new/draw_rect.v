@@ -33,8 +33,8 @@ module draw_rect
   input wire rst,
   input wire module_en,
 
-  input wire [8:0] xpos,
-  input wire [8:0] ypos,
+  input wire [9:0] xpos,
+  input wire [9:0] ypos,
   input wire [`VGA_BUS_SIZE-1:0] vga_bus_in,
   output wire [`VGA_BUS_SIZE-1:0] vga_bus_out
   );

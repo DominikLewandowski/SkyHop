@@ -39,8 +39,6 @@ module time_bar(
   localparam MS_PER_PIXEL = 40;             // czas = 40 [ms/pixel] * 800 [pixel] = 32 sec
   localparam MS_PER_PIXEL_BIT = 6;
   
-  localparam BAR_COLOR = 12'h4_C_0;
-  localparam BAR_BG_COLOR = 12'h3_3_3;
   localparam SCRREN_HEIGHT = 600;
   
   `VGA_BUS_SPLIT( vga_bus_in )
@@ -51,8 +49,7 @@ module time_bar(
   wire [10:0] vcount_out_nxt = vcount_in;
   wire hsync_out_nxt = hsync_in;
   wire vsync_out_nxt = vsync_in;
-  //wire hblnk_out_nxt = hblnk_in;
-  //wire vblnk_out_nxt = vblnk_in;
+
   reg [11:0] rgb_out_nxt;
   reg elapsed_nxt;
   
@@ -75,11 +72,9 @@ module time_bar(
       vcount_out <=  0; 
       hsync_out <=  0;
       vsync_out <=  0;
-      //vblnk_out <=  0;
-      //hblnk_out <=  0;
+      rgb_out <=  0;
       time_counter <= 0;
       pixel_counter <= 0;
-      rgb_out <=  0;
       state <= S_IDLE;
       elapsed <= 0;
     end
@@ -88,8 +83,6 @@ module time_bar(
       vcount_out <= vcount_out_nxt; 
       hsync_out <= hsync_out_nxt;
       vsync_out <= vsync_out_nxt;
-      //hblnk_out <= hblnk_out_nxt;
-      //vblnk_out <= vblnk_out_nxt;
       rgb_out <= rgb_out_nxt;
       time_counter <= time_counter_nxt;
       pixel_counter <= pixel_counter_nxt;
@@ -112,7 +105,7 @@ module time_bar(
           
       S_ENABLE:
         begin   
-          if( (vcount_in >= (SCRREN_HEIGHT - BAR_HEIGHT)) && (vcount_in < SCRREN_HEIGHT) ) rgb_out_nxt = BAR_COLOR;
+          if( (vcount_in >= (SCRREN_HEIGHT - BAR_HEIGHT)) && (vcount_in < SCRREN_HEIGHT) ) rgb_out_nxt = `BAR_COLOR;
           if(start == 1)
             begin  
               state_nxt = S_STARTED;
@@ -136,7 +129,7 @@ module time_bar(
           end
 
           if( (vcount_in >= (SCRREN_HEIGHT - BAR_HEIGHT)) && (vcount_in < SCRREN_HEIGHT) && (hcount_in < BAR_WIDTH) )
-                rgb_out_nxt = (hcount_in >= pixel_counter) ? BAR_BG_COLOR : BAR_COLOR; 
+                rgb_out_nxt = (hcount_in >= pixel_counter) ? `BAR_BG_COLOR : `BAR_COLOR; 
           if( pixel_counter == 0 ) state_nxt = S_STOPPED;
           else if( module_en == 0 ) state_nxt = S_IDLE;
           else state_nxt = S_STARTED;
@@ -147,7 +140,7 @@ module time_bar(
           elapsed_nxt = 1'b1;    
           if(module_en == 0) state_nxt = S_IDLE;
           else state_nxt = S_STOPPED;
-          if( (vcount_in >= (SCRREN_HEIGHT - BAR_HEIGHT)) && (vcount_in < SCRREN_HEIGHT) ) rgb_out_nxt = BAR_BG_COLOR;
+          if( (vcount_in >= (SCRREN_HEIGHT - BAR_HEIGHT)) && (vcount_in < SCRREN_HEIGHT) ) rgb_out_nxt = `BAR_BG_COLOR;
         end
         
       default: state_nxt = S_IDLE;

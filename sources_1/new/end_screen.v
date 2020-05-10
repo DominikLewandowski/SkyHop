@@ -29,47 +29,51 @@ module end_screen(
   input wire [`VGA_BUS_SIZE-1:0] vga_bus_in,
   output wire [`VGA_BUS_SIZE-1:0] vga_bus_out
   );
-
-  `VGA_BUS_SPLIT( vga_bus_in )
-  `VGA_DEFINE_OUT_REG
-  `VGA_BUS_MERGE( vga_bus_out )
-
-  wire [10:0] hcount_out_nxt = hcount_in;
-  wire [10:0] vcount_out_nxt = vcount_in;
-  wire hsync_out_nxt = hsync_in;
-  wire vsync_out_nxt = vsync_in;
-  //wire hblnk_out_nxt = hblnk_in;
-  //wire vblnk_out_nxt = vblnk_in;
   
-  reg [11:0] rgb_out_nxt;
-  
-  always @*
-  begin
-    if ( module_en == 1 ) 
-    begin
-      if( (hcount_in > 500) && (hcount_in < 650) && (vcount_in > 100) && (vcount_in < 150) ) rgb_out_nxt = 12'h000;
-      else rgb_out_nxt = rgb_in; 
-    end
-    else rgb_out_nxt = rgb_in; 
-  end  
+  localparam TEXT_POS_X = (800/2)-(12*8*2/2)-1;
 
-  always@(posedge clk)
-    if (rst) begin
-      hcount_out <= 0;
-      vcount_out <= 0; 
-      hsync_out <=  0;
-      vsync_out <=  0;
-      //hblnk_out <=  0;
-      //vblnk_out <=  0;
-      rgb_out <=  0; 
-    end
-    else begin
-      hcount_out <= hcount_out_nxt;
-      vcount_out <= vcount_out_nxt; 
-      hsync_out <= hsync_out_nxt;
-      vsync_out <= vsync_out_nxt;
-      //hblnk_out <= hblnk_out_nxt;      
-      //vblnk_out <= vblnk_out_nxt;
-      rgb_out <= rgb_out_nxt;
-    end    
+  reg [6:0] char_code;
+  wire [3:0] char_line;
+  wire [7:0] char_xy, char_line_pixels;
+  
+  draw_rect_char #(
+    .TEXT_COLOUR(12'h03A),
+    .FONT_SIZE(2),
+    .TEXT_POS_X(TEXT_POS_X),
+    .TEXT_POS_Y(150),
+    .TEXT_SIZE_X(12),
+    .TEXT_SIZE_Y(1)
+  ) text_unit (
+    .text_en(module_en),
+    .vga_bus_in(vga_bus_in),
+    .char_pixels(char_line_pixels),
+    .vga_bus_out(vga_bus_out),
+    .char_xy(char_xy),
+    .char_line(char_line),
+    .clk(clk),
+    .rst(rst)
+  ); 
+    
+  font_rom my_font_rom (
+    .clk(clk),  
+    .addr({char_code, char_line}),       
+    .char_line_pixels(char_line_pixels) 
+  );
+  
+  always@*
+    casex(char_xy)
+      8'h00: char_code = "G"; 
+      8'h10: char_code = "a";
+      8'h20: char_code = "m"; 
+      8'h30: char_code = "e"; 
+      8'h40: char_code = " "; 
+      8'h50: char_code = "o"; 
+      8'h60: char_code = "v"; 
+      8'h70: char_code = "e"; 
+      8'h80: char_code = "r"; 
+      8'h90: char_code = " "; 
+      8'hA0: char_code = ":"; 
+      8'hB0: char_code = "P";
+      default: char_code = 7'h00;
+    endcase   
 endmodule
