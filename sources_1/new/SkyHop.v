@@ -24,7 +24,7 @@
 module SkyHop(
   input wire rst,
   input wire clk,
-  input wire [6:0] sw,
+  input wire [7:0] sw,
   input wire btnU, btnL, btnR,
   output wire led,
   output wire vs,
@@ -63,6 +63,8 @@ module SkyHop(
   wire character_en = sw[4];
   wire points_en = sw[5];
   wire end_screen_en = sw[6];
+  
+  wire layer_select = sw[7];
   // ------------------------------------------------------------------------------------ //
   
   wire one_ms_tick;
@@ -110,6 +112,8 @@ module SkyHop(
   );
   
   blocks my_blocks (
+    .layer_select(layer_select),
+    .one_ms_tick(one_ms_tick),
     .module_en(blocks_en),
     .jump_left(btnL_tick),
     .jump_right(btnR_tick),

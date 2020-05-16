@@ -41,7 +41,7 @@ module character(
   
   localparam CHARACTER_COLOR = 12'hFF0;
   localparam CHARACTER_HEIGHT = 60;
-  localparam CHARACTER_WIDTH = 60;
+  localparam CHARACTER_WIDTH = 40;
   localparam GAME_WIDTH = 800;
   
   
@@ -69,7 +69,7 @@ module character(
   always @*
   begin
     state_nxt = state;
-    character_y_nxt = 500;
+    character_y_nxt = 450;
     character_x_nxt = character_x;
     one_ms_timer_nxt = one_ms_timer;
     landed_nxt = 0;
