@@ -29,6 +29,9 @@ module state_machine(
   input wire clk,
   input wire rst,
   
+  //input wire keyboard_flag,
+  //input wire keyboard_data,
+  
   input wire jump_fail,
   input wire time_elapsed,
   input wire character_landed,
