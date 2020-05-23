@@ -46,32 +46,41 @@ module SkyHop(
     .clk(clk)                // Clock in ports
   );
   
-  // -------------  For test only  ------------------------------------------------------- //
-  wire btnU_tick, btnL_tick, btnR_tick, btnD_tick;
-  btn_debounce my_db_1( .clk(clk_40MHz), .reset(rst), .sw(btnU), .db_level(), .db_tick(btnU_tick));
-  btn_debounce my_db_2( .clk(clk_40MHz), .reset(rst), .sw(btnL), .db_level(), .db_tick(btnL_tick));
-  btn_debounce my_db_3( .clk(clk_40MHz), .reset(rst), .sw(btnR), .db_level(), .db_tick(btnR_tick));
-  
-  wire time_bar_start = btnU_tick;
-  wire jump_left = btnL_tick;
-  wire jump_right = btnR_tick;
-  
-  wire bg_clor_select = sw[0];
-  wire start_screen_en = sw[1];
-  wire blocks_en = sw[2];
-  wire time_bar_en = sw[3];
-  wire character_en = sw[4];
-  wire points_en = sw[5];
-  wire end_screen_en = sw[6];
-  
   wire layer_select = sw[7];
-  // ------------------------------------------------------------------------------------ //
+  
+  wire start_screen_en, blocks_en, time_bar_en, character_en, points_en, end_screen_en;
+  wire bg_clor_select, jump_left, jump_right, jump_fail, timer_start, time_elapsed, character_landed;
   
   wire one_ms_tick;
   millisecond_timer my_millisecond_timer (
     .clk_40MHz(clk_40MHz), 
     .rst(rst),
     .one_milli_tick(one_ms_tick)
+  );
+  
+  state_machine FSM (
+    // --- for test only --- //
+    .sw(sw[6:0]),
+    .btnU(btnU), 
+    .btnL(btnL), 
+    .btnR(btnR),
+    .led(led),
+    // --------------------- //
+    .clk(clk_40MHz),
+    .rst(rst),
+    .jump_fail(jump_fail),
+    .time_elapsed(time_elapsed),
+    .character_landed(character_landed),
+    .start_screen_en(start_screen_en),
+    .blocks_en(blocks_en),
+    .time_bar_en(time_bar_en),
+    .character_en(character_en),
+    .points_en(points_en),
+    .end_screen_en(end_screen_en),
+    .bg_clor_select(bg_clor_select),
+    .jump_left(jump_left),
+    .jump_right(jump_right),
+    .timer_start(timer_start)
   );
   
   wire [10:0] vcount, hcount;
@@ -115,8 +124,8 @@ module SkyHop(
     .layer_select(layer_select),
     .one_ms_tick(one_ms_tick),
     .module_en(blocks_en),
-    .jump_left(btnL_tick),
-    .jump_right(btnR_tick),
+    .jump_left(jump_left),
+    .jump_right(jump_right),
     .vga_bus_in(vga_bus[1]),
     .vga_bus_out(vga_bus[2]),
     .rst(rst),
@@ -126,21 +135,20 @@ module SkyHop(
   time_bar my_time_bar (
     .module_en(time_bar_en),
     .one_ms_tick(one_ms_tick),
-    .start(time_bar_start),
+    .start(timer_start),
     .vga_bus_in(vga_bus[2]),
     .vga_bus_out(vga_bus[3]),
-    .elapsed(led),
+    .elapsed(time_elapsed),
     .rst(rst),
     .clk(clk_40MHz)
   );
   
-  wire points_inc;
   character my_character (
     .module_en(character_en),
-    .jump_left(btnL_tick),
-    .jump_right(btnR_tick),
+    .jump_left(jump_left),
+    .jump_right(jump_right),
     .one_ms_tick(one_ms_tick),
-    .landed(points_inc),
+    .landed(character_landed),
     .vga_bus_in(vga_bus[3]),
     .vga_bus_out(vga_bus[4]),
     .rst(rst),
@@ -149,7 +157,7 @@ module SkyHop(
   
   points my_points (
     .module_en(points_en),
-    .increase(points_inc),
+    .increase(character_landed),
     .vga_bus_in(vga_bus[4]),
     .vga_bus_out(vga_bus[5]),
     .rst(rst),
@@ -169,4 +177,3 @@ module SkyHop(
   assign {r,g,b} = vga_bus[6][`VGA_RGB_BIT];
   
 endmodule
-
