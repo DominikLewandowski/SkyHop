@@ -87,6 +87,7 @@ module character(
             state_nxt = S_JUMP_R;
             one_ms_timer_nxt = 0;
           end
+        else if( module_en == 0 ) character_x_nxt = (GAME_WIDTH/2)-(CHARACTER_WIDTH/2)-1;
         else state_nxt = state;
         
       S_JUMP_R:
