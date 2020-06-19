@@ -24,7 +24,7 @@
 module SkyHop(
   input wire rst,
   input wire clk,
-  input wire [7:0] sw,
+  input wire sw,
   input wire btnU, btnL, btnR,
   output wire led,
   output wire vs,
@@ -46,7 +46,7 @@ module SkyHop(
     .clk(clk)                // Clock in ports
   );
   
-  wire layer_select = sw[7];
+  wire layer_select = sw;
   
   wire start_screen_en, blocks_en, time_bar_en, character_en, points_en, end_screen_en;
   wire bg_clor_select, jump_left, jump_right, jump_fail, timer_start, time_elapsed, character_landed;
@@ -58,16 +58,20 @@ module SkyHop(
     .one_milli_tick(one_ms_tick)
   );
   
-  state_machine FSM (
-    // --- for test only --- //
-    .sw(sw[6:0]),
+  wire [1:0] key_code;
+  keyboard my_keyboard(
+    .clk(clk_40MHz),
+    .rst(rst),
     .btnU(btnU), 
     .btnL(btnL), 
     .btnR(btnR),
-    .led(led),
-    // --------------------- //
+    .key_code(key_code)
+   );
+  
+  state_machine FSM (
     .clk(clk_40MHz),
     .rst(rst),
+    .key(key_code),
     .jump_fail(jump_fail),
     .time_elapsed(time_elapsed),
     .character_landed(character_landed),

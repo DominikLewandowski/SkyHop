@@ -19,82 +19,63 @@
 // 
 //////////////////////////////////////////////////////////////////////////////////
 
+localparam S_START =        3'b000;
+localparam S_PREPARE_MAP =  3'b001;
+localparam S_GAME_IDLE =    3'b011;
+localparam S_JUMP_L =       3'b010;
+localparam S_JUMP_R =       3'b110;
+localparam S_CHAR_FLY =     3'b111;
+localparam S_CHAR_FALL =    3'b101;
+localparam S_GAME_END =     3'b100;
+localparam S_WIDTH = 3;
 
-module state_machine(
-  // --- for test only --- //
-  input wire [6:0] sw,
-  input wire btnU, btnL, btnR,
-  output wire led,
-  // --------------------- //
+localparam K_LEFT     = 2'b01;  // Left arrow
+localparam K_RIGHT    = 2'b10;  // Right arrow
+localparam K_SPACEBAR = 2'b11;  // Spacebar
+
+module state_machine (
   input wire clk,
   input wire rst,
-  
-  //input wire keyboard_flag,
-  //input wire keyboard_data,
-  
+  input wire [1:0] key,
   input wire jump_fail,
   input wire time_elapsed,
   input wire character_landed,
   
-  output reg start_screen_en,
-  output reg blocks_en,
-  output reg time_bar_en,
-  output reg character_en,
-  output reg points_en,
-  output reg end_screen_en,
-  
-  output reg bg_clor_select,
-  output reg jump_left,
-  output reg jump_right,
-  output reg timer_start
+  output wire start_screen_en,
+  output wire blocks_en,
+  output wire time_bar_en,
+  output wire character_en,
+  output wire points_en,
+  output wire end_screen_en,
+  output wire bg_clor_select,
+  output wire jump_left,
+  output wire jump_right,
+  output wire timer_start
   );
   
-  // -------------  For test only  ------------------------------------------------------- //
-  assign led = time_elapsed;
-  wire btnU_tick, btnL_tick, btnR_tick;
-  btn_debounce my_db_1( .clk(clk), .reset(rst), .sw(btnU), .db_level(), .db_tick(btnU_tick));
-  btn_debounce my_db_2( .clk(clk), .reset(rst), .sw(btnL), .db_level(), .db_tick(btnL_tick));
-  btn_debounce my_db_3( .clk(clk), .reset(rst), .sw(btnR), .db_level(), .db_tick(btnR_tick));
+  reg [9:0] outputs;
+  assign {start_screen_en, blocks_en, time_bar_en, character_en, points_en, end_screen_en, bg_clor_select, jump_left, jump_right, timer_start} = outputs[9:0];
   
-  wire timer_start_nxt = btnU_tick;
-  wire jump_left_nxt = btnL_tick;
-  wire jump_right_nxt = btnR_tick;
+  reg [S_WIDTH-1:0] state;
+  wire [S_WIDTH-1:0] state_nxt;
+  reg [S_WIDTH-1:0] next_state;
   
-  wire bg_clor_select_nxt = sw[0];
-  wire start_screen_en_nxt = sw[1];
-  wire blocks_en_nxt = sw[2];
-  wire time_bar_en_nxt = sw[3];
-  wire character_en_nxt = sw[4];
-  wire points_en_nxt = sw[5];
-  wire end_screen_en_nxt = sw[6];
-  // ------------------------------------------------------------------------------------ //
+  always @* begin
+    case (state)
+      S_START:          {outputs, next_state} = {10'b1000000000, (key == K_SPACEBAR) ? S_PREPARE_MAP : S_START};
+      S_PREPARE_MAP:    {outputs, next_state} = {10'b1000000000, S_GAME_IDLE};
+      S_GAME_IDLE:      {outputs, next_state} = {10'b0111101000, time_elapsed ? S_GAME_END : ((key == K_LEFT) ? S_JUMP_L : ((key == K_RIGHT) ? S_JUMP_R : S_GAME_IDLE))};
+      S_JUMP_L:         {outputs, next_state} = {10'b0111101101, S_CHAR_FLY};
+      S_JUMP_R:         {outputs, next_state} = {10'b0111101011, S_CHAR_FLY};
+      S_CHAR_FLY:       {outputs, next_state} = {10'b0111101001, character_landed ? S_GAME_IDLE : S_CHAR_FLY};
+      S_GAME_END:       {outputs, next_state} = {10'b0000010000, (key == K_SPACEBAR) ? S_START : S_GAME_END};
+      default:          {outputs, next_state} = {10'b1000000000, (key == K_SPACEBAR) ? S_PREPARE_MAP : S_START};
+    endcase
+  end
   
-  always@(posedge clk)
-    if(rst) 
-      begin
-        bg_clor_select <= 0;
-        start_screen_en <= 0;
-        blocks_en <= 0;
-        time_bar_en <= 0;
-        character_en <= 0;
-        points_en <= 0;
-        end_screen_en <= 0;
-        timer_start <= 0;
-        jump_left <= 0;
-        jump_right <= 0;
-      end 
-    else 
-      begin
-        bg_clor_select <= bg_clor_select_nxt;
-        start_screen_en <= start_screen_en_nxt;
-        blocks_en <= blocks_en_nxt;
-        time_bar_en <= time_bar_en_nxt;
-        character_en <= character_en_nxt;
-        points_en <= points_en_nxt;
-        end_screen_en <= end_screen_en_nxt;
-        timer_start <= timer_start_nxt;
-        jump_left <= jump_left_nxt;
-        jump_right <= jump_right_nxt;
-      end
-  
+  assign state_nxt = rst ? S_START : next_state;
+
+  always @ (posedge clk)
+    state <= state_nxt;
+
 endmodule
