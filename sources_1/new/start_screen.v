@@ -32,8 +32,9 @@ module start_screen(
   
   wire [`VGA_BUS_SIZE-1:0] vga_bus;
   
-  localparam TEXT_POS_X_1 = (800/2)-(7*8*4/2)-1;
-  localparam TEXT_POS_X_2 = (800/2)-(16*8*2/2)-1;
+  localparam CHAR_WIDHT = 8;
+  localparam TEXT_1_POS_X = (`GAME_WIDTH / 2) - ((7 * CHAR_WIDHT * 4) / 2) - 1;
+  localparam TEXT_2_POS_X = (`GAME_WIDTH / 2) - ((16 * CHAR_WIDHT * 2) / 2) - 1;
   
   reg [6:0] char_code_1;
   wire [3:0] char_line_1;
@@ -42,7 +43,7 @@ module start_screen(
   draw_rect_char #(
     .TEXT_COLOUR(12'h03A),
     .FONT_SIZE(3),
-    .TEXT_POS_X(TEXT_POS_X_1),
+    .TEXT_POS_X(TEXT_1_POS_X),
     .TEXT_POS_Y(120),
     .TEXT_SIZE_X(7),
     .TEXT_SIZE_Y(1)
@@ -82,7 +83,7 @@ module start_screen(
   draw_rect_char #(
     .TEXT_COLOUR(12'hFFF),
     .FONT_SIZE(2),
-    .TEXT_POS_X(TEXT_POS_X_2),
+    .TEXT_POS_X(TEXT_2_POS_X),
     .TEXT_POS_Y(200),
     .TEXT_SIZE_X(16),
     .TEXT_SIZE_Y(6)

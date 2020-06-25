@@ -42,8 +42,6 @@ module character(
   localparam CHARACTER_COLOR = 12'hFF0;
   localparam CHARACTER_HEIGHT = 60;
   localparam CHARACTER_WIDTH = 40;
-  localparam GAME_WIDTH = 800;
-  
   
   draw_rect #(
     .RECT_COLOUR(CHARACTER_COLOR),
@@ -87,7 +85,7 @@ module character(
             state_nxt = S_JUMP_R;
             one_ms_timer_nxt = 0;
           end
-        else if( module_en == 0 ) character_x_nxt = (GAME_WIDTH/2)-(CHARACTER_WIDTH/2)-1;
+        else if( module_en == 0 ) character_x_nxt = (`GAME_WIDTH/2)-(CHARACTER_WIDTH/2)-1;
         else state_nxt = state;
         
       S_JUMP_R:
@@ -124,7 +122,7 @@ module character(
 
   always@(posedge clk)
     if (rst) begin
-      character_x <= (GAME_WIDTH/2)-(CHARACTER_WIDTH/2)-1;
+      character_x <= (`GAME_WIDTH/2)-(CHARACTER_WIDTH/2)-1;
       character_y <= 0;
       state <= S_IDLE;
       landed <= 0;

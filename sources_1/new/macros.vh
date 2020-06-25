@@ -1,6 +1,9 @@
 `ifndef MACROS_VH
 `define MACROS_V
 
+`define GAME_WIDTH 800
+`define GAME_HEIGHT 600
+
 // ------ DRAW BACKGROUND ------ //
 `define BG_COLOR_L 12'h5_9_F
 `define BG_COLOR_D 12'h3_7_F

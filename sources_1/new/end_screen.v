@@ -30,7 +30,8 @@ module end_screen(
   output wire [`VGA_BUS_SIZE-1:0] vga_bus_out
   );
   
-  localparam TEXT_POS_X = (800/2)-(12*8*2/2)-1;
+  localparam CHAR_WIDHT = 8;
+  localparam TEXT_POS_X = (`GAME_WIDTH / 2) - ((13 * CHAR_WIDHT * 2) / 2) - 1;
 
   reg [6:0] char_code;
   wire [3:0] char_line;
@@ -41,7 +42,7 @@ module end_screen(
     .FONT_SIZE(2),
     .TEXT_POS_X(TEXT_POS_X),
     .TEXT_POS_Y(150),
-    .TEXT_SIZE_X(12),
+    .TEXT_SIZE_X(13),
     .TEXT_SIZE_Y(1)
   ) text_unit (
     .text_en(module_en),
@@ -62,18 +63,19 @@ module end_screen(
   
   always@*
     casex(char_xy)
-      8'h00: char_code = "G"; 
-      8'h10: char_code = "a";
-      8'h20: char_code = "m"; 
-      8'h30: char_code = "e"; 
-      8'h40: char_code = " "; 
-      8'h50: char_code = "o"; 
-      8'h60: char_code = "v"; 
-      8'h70: char_code = "e"; 
-      8'h80: char_code = "r"; 
-      8'h90: char_code = " "; 
-      8'hA0: char_code = ":"; 
-      8'hB0: char_code = "P";
+      8'h00: char_code = "E"; 
+      8'h10: char_code = "N";
+      8'h20: char_code = "D"; 
+      8'h30: char_code = " "; 
+      8'h40: char_code = "O"; 
+      8'h50: char_code = "F"; 
+      8'h60: char_code = " "; 
+      8'h70: char_code = "T"; 
+      8'h80: char_code = "I"; 
+      8'h90: char_code = "M"; 
+      8'hA0: char_code = "E"; 
+      8'hB0: char_code = ":";
+      8'hC0: char_code = "P";
       default: char_code = 7'h00;
     endcase   
 endmodule

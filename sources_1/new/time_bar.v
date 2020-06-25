@@ -34,12 +34,10 @@ module time_bar(
   output reg elapsed
   );
   
-  localparam BAR_WIDTH = 800;
+  localparam BAR_WIDTH = `GAME_WIDTH;
   localparam BAR_HEIGHT = 25;
   localparam MS_PER_PIXEL = 40;             // czas = 40 [ms/pixel] * 800 [pixel] = 32 sec
   localparam MS_PER_PIXEL_BIT = 6;
-  
-  localparam SCRREN_HEIGHT = 600;
   
   `VGA_BUS_SPLIT( vga_bus_in )
   `VGA_DEFINE_OUT_REG
@@ -105,7 +103,7 @@ module time_bar(
           
       S_ENABLE:
         begin   
-          if( (vcount_in >= (SCRREN_HEIGHT - BAR_HEIGHT)) && (vcount_in < SCRREN_HEIGHT) ) rgb_out_nxt = `BAR_COLOR;
+          if( (vcount_in >= (`GAME_HEIGHT - BAR_HEIGHT)) && (vcount_in < `GAME_HEIGHT) ) rgb_out_nxt = `BAR_COLOR;
           if(start == 1)
             begin  
               state_nxt = S_STARTED;
@@ -128,7 +126,7 @@ module time_bar(
               end
           end
 
-          if( (vcount_in >= (SCRREN_HEIGHT - BAR_HEIGHT)) && (vcount_in < SCRREN_HEIGHT) && (hcount_in < BAR_WIDTH) )
+          if( (vcount_in >= (`GAME_HEIGHT - BAR_HEIGHT)) && (vcount_in < `GAME_HEIGHT) && (hcount_in < BAR_WIDTH) )
                 rgb_out_nxt = (hcount_in >= pixel_counter) ? `BAR_BG_COLOR : `BAR_COLOR; 
           if( pixel_counter == 0 ) state_nxt = S_STOPPED;
           else if( module_en == 0 ) state_nxt = S_IDLE;
@@ -140,7 +138,7 @@ module time_bar(
           elapsed_nxt = 1'b1;    
           if(module_en == 0) state_nxt = S_IDLE;
           else state_nxt = S_STOPPED;
-          if( (vcount_in >= (SCRREN_HEIGHT - BAR_HEIGHT)) && (vcount_in < SCRREN_HEIGHT) ) rgb_out_nxt = `BAR_BG_COLOR;
+          if( (vcount_in >= (`GAME_HEIGHT - BAR_HEIGHT)) && (vcount_in < `GAME_HEIGHT) ) rgb_out_nxt = `BAR_BG_COLOR;
         end
         
       default: state_nxt = S_IDLE;
