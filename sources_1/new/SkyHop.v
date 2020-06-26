@@ -25,13 +25,10 @@ module SkyHop(
   input wire rst,
   input wire clk,
   input wire sw,
-  input wire btnU, btnL, btnR,
-  output wire led,
+  input wire btnU, btnL, btnR, btnD,
   output wire vs,
   output wire hs,
-  output wire [3:0] r,
-  output wire [3:0] g,
-  output wire [3:0] b
+  output wire [3:0] r, g, b
   );
   
   wire locked;
@@ -50,6 +47,10 @@ module SkyHop(
   
   wire start_screen_en, blocks_en, time_bar_en, character_en, points_en, end_screen_en;
   wire bg_clor_select, jump_left, jump_right, jump_fail, timer_start, time_elapsed, character_landed;
+  
+  // for test only //
+  assign jump_fail = btnD;
+  // ------------ //
   
   wire one_ms_tick;
   millisecond_timer ms_timer (
@@ -160,6 +161,7 @@ module SkyHop(
     .module_en(character_en),
     .jump_left(jump_left),
     .jump_right(jump_right),
+    .jump_fail(jump_fail),
     .one_ms_tick(one_ms_tick),
     .landed(character_landed),
     .vga_bus_in(vga_bus[3]),

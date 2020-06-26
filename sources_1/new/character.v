@@ -27,6 +27,7 @@ module character(
   input wire module_en,
   input wire jump_left,
   input wire jump_right,
+  input wire jump_fail,
   input wire one_ms_tick,
   output reg landed,
 
@@ -58,9 +59,10 @@ module character(
   );
   
   reg [1:0] state, state_nxt;
-  localparam S_IDLE = 2'b00;
+  localparam S_IDLE   = 2'b00;
   localparam S_JUMP_R = 2'b01;
   localparam S_JUMP_L = 2'b10;
+  localparam S_FALL   = 2'b11;
   
   reg [6:0] one_ms_timer, one_ms_timer_nxt;
   
@@ -75,18 +77,11 @@ module character(
     case(state)
     
       S_IDLE:
-        if( jump_left == 1 ) 
-          begin 
-            state_nxt = S_JUMP_L;
-            one_ms_timer_nxt = 0;
-          end
-        else if( jump_right == 1 ) 
-          begin
-            state_nxt = S_JUMP_R;
-            one_ms_timer_nxt = 0;
-          end
-        else if( module_en == 0 ) character_x_nxt = (`GAME_WIDTH/2)-(CHARACTER_WIDTH/2)-1;
-        else state_nxt = state;
+      begin 
+        if( module_en == 0 ) character_x_nxt = (`GAME_WIDTH / 2)-(CHARACTER_WIDTH / 2) - 1;
+        state_nxt = jump_fail ? S_FALL : jump_left ? S_JUMP_L : jump_right ? S_JUMP_R : state;
+        one_ms_timer_nxt = 0;
+      end
         
       S_JUMP_R:
         begin 
@@ -115,6 +110,9 @@ module character(
                 end
             end  
         end
+        
+       S_FALL:
+         state_nxt = S_IDLE;
         
       default: state_nxt = S_IDLE;
     endcase

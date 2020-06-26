@@ -34,7 +34,7 @@ module blocks(
   );
   
   localparam NUM_MODULES = 5;
-  localparam LAYER_SPACE = 150;
+  localparam LAYER_SPACE = 8'd150;
   
   wire [`VGA_BUS_SIZE-1:0] vga_bus [NUM_MODULES:0];
   wire [6:0] layer_map [NUM_MODULES:0];
@@ -52,7 +52,7 @@ module blocks(
   generate
   for(i = 0; i < NUM_MODULES; i = i + 1) begin
   
-    shift_layer #(.POS_Y(12'd25 + (LAYER_SPACE*i))) u_layer(
+    shift_layer #(.POS_Y(i)) u_layer(
       .clk(clk),
       .rst(rst),
       .one_ms_tick(one_ms_tick),

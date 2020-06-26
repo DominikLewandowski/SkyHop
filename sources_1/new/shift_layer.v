@@ -21,7 +21,7 @@
 //////////////////////////////////////////////////////////////////////////////////
 
 
-module shift_layer #(parameter POS_Y = 12'd0)
+module shift_layer #(parameter POS_Y = 0)
 (
   input wire clk,
   input wire rst,
@@ -43,6 +43,12 @@ module shift_layer #(parameter POS_Y = 12'd0)
   reg [0:6] layer_map_out_nxt;
   reg [0:6] block_type_out_nxt;
   
+  wire [11:0] y_offset = (POS_Y==0) ? 12'd25 :
+                         (POS_Y==1) ? 12'd175 :
+                         (POS_Y==2) ? 12'd325 :
+                         (POS_Y==3) ? 12'd475 :
+                         (POS_Y==4) ? 12'd625 : 12'd0;
+  
   draw_layer my_draw_layer
   (
     .pclk(clk),
@@ -51,7 +57,7 @@ module shift_layer #(parameter POS_Y = 12'd0)
     .block_type(block_type_in),
     .rgb_pixel_ground(rgb_ground_rom),
     .rgb_pixel_sky(rgb_sky_rom),
-    .ypos(POS_Y + {4'b0,shift_y}),
+    .ypos((shift_y + y_offset)),
     .vga_bus_in(vga_bus_in),
     .vga_bus_out(vga_bus_out),
     .pixel_addr(pixel_addres_rom)
