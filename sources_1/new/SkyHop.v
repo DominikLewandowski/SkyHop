@@ -52,10 +52,18 @@ module SkyHop(
   wire bg_clor_select, jump_left, jump_right, jump_fail, timer_start, time_elapsed, character_landed;
   
   wire one_ms_tick;
-  millisecond_timer my_millisecond_timer (
+  millisecond_timer ms_timer (
     .clk_40MHz(clk_40MHz), 
     .rst(rst),
     .one_milli_tick(one_ms_tick)
+  );
+  
+  wire one_sec_tick;
+  one_second_timer sec_timer (
+    .clk(clk_40MHz), 
+    .rst(rst),
+    .one_milli_tick(one_ms_tick),
+    .one_sec_tick(one_sec_tick)
   );
   
   wire [1:0] key_code;
@@ -118,6 +126,7 @@ module SkyHop(
   
   start_screen my_start_screen (
     .module_en(start_screen_en),
+    .one_sec_tick(one_sec_tick),
     .vga_bus_in(vga_bus[0]),
     .vga_bus_out(vga_bus[1]),
     .rst(rst),
