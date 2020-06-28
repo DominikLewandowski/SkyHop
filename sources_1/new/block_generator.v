@@ -21,6 +21,16 @@
 
 
 module block_generator(
+  input wire layer_select,
+  output wire [0:6] layer_map,
+  output wire [0:6] block_type
+);
 
-    );
+
+  // ----------  For test only  ----------------- //
+  assign layer_map = (layer_select) ? 7'b1010101 : 7'b0101010;
+  assign block_type = (layer_select) ? 7'b1000101 : 7'b0100010;
+  // -------------------------------------------- //
+  
+  
 endmodule
