@@ -44,6 +44,8 @@ module character(
   localparam CHARACTER_HEIGHT = 60;
   localparam CHARACTER_WIDTH = 40;
   
+  localparam CHARACTER_POS_Y = 625 - 100 - CHARACTER_HEIGHT;
+  
   draw_rect #(
     .RECT_COLOUR(CHARACTER_COLOR),
     .RECT_WIDTH(CHARACTER_WIDTH),
@@ -64,12 +66,12 @@ module character(
   localparam S_JUMP_L = 2'b10;
   localparam S_FALL   = 2'b11;
   
-  reg [6:0] one_ms_timer, one_ms_timer_nxt;
+  reg [7:0] one_ms_timer, one_ms_timer_nxt;
   
   always @*
   begin
     state_nxt = state;
-    character_y_nxt = 450;
+    character_y_nxt = character_y;
     character_x_nxt = character_x;
     one_ms_timer_nxt = one_ms_timer;
     landed_nxt = 0;
@@ -78,50 +80,57 @@ module character(
     
       S_IDLE:
       begin 
-        if( module_en == 0 ) character_x_nxt = (`GAME_WIDTH / 2)-(CHARACTER_WIDTH / 2) - 1;
-        state_nxt = jump_fail ? S_FALL : jump_left ? S_JUMP_L : jump_right ? S_JUMP_R : state;
+        state_nxt = jump_fail ? S_FALL : (jump_left ? S_JUMP_L : (jump_right ? S_JUMP_R : state));
         one_ms_timer_nxt = 0;
       end
         
       S_JUMP_R:
-        begin 
-          if( one_ms_tick == 1 )
-            begin
-              character_x_nxt = character_x + 1;
-              if( one_ms_timer < 79 ) one_ms_timer_nxt = one_ms_timer + 1;
-              else 
-                begin
-                  landed_nxt = 1;
-                  state_nxt = S_IDLE;
-                end
-            end  
-        end
-        
+        if( one_ms_tick == 1 )
+          begin
+            character_x_nxt = character_x + 1;
+            character_y_nxt = (one_ms_timer < 40) ? character_y - 1 : character_y + 1;
+            if( one_ms_timer < 79 ) one_ms_timer_nxt = one_ms_timer + 1;
+            else 
+              begin
+                landed_nxt = 1;
+                state_nxt = S_IDLE;
+              end
+          end  
+  
       S_JUMP_L:
-        begin 
-          if( one_ms_tick == 1 )
-            begin
-              character_x_nxt = character_x - 1;
-              if( one_ms_timer < 79 ) one_ms_timer_nxt = one_ms_timer + 1;
-              else 
-                begin
-                  landed_nxt = 1;
-                  state_nxt = S_IDLE;
-                end
-            end  
-        end
-        
+        if( one_ms_tick == 1 )
+          begin
+            character_x_nxt = character_x - 1;
+            character_y_nxt = (one_ms_timer < 40) ? character_y - 1 : character_y + 1;
+            if( one_ms_timer < 79 ) one_ms_timer_nxt = one_ms_timer + 1;
+            else 
+              begin
+                landed_nxt = 1;
+                state_nxt = S_IDLE;
+              end
+          end  
+     
        S_FALL:
-         state_nxt = S_IDLE;
+         if( one_ms_tick == 1 )
+           begin
+             character_y_nxt = character_y + 1;
+             if( one_ms_timer < 200 ) one_ms_timer_nxt = one_ms_timer + 1;
+             else 
+               begin
+                 landed_nxt = 1;
+                 state_nxt = S_IDLE;
+               end
+            end  
+
         
       default: state_nxt = S_IDLE;
     endcase
   end    
 
   always@(posedge clk)
-    if (rst) begin
+    if (rst || (module_en == 0)) begin
       character_x <= (`GAME_WIDTH/2)-(CHARACTER_WIDTH/2)-1;
-      character_y <= 0;
+      character_y <= CHARACTER_POS_Y;
       state <= S_IDLE;
       landed <= 0;
       one_ms_timer <= 0;

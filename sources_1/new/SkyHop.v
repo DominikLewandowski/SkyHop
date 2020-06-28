@@ -47,7 +47,7 @@ module SkyHop(
   
   wire start_screen_en, blocks_en, time_bar_en, character_en, points_en, end_screen_en;
   wire bg_clor_select, jump_left, jump_right, jump_fail, timer_start, time_elapsed, character_landed;
-  
+
   wire one_ms_tick;
   millisecond_timer ms_timer (
     .clk_40MHz(clk_40MHz), 
@@ -143,17 +143,6 @@ module SkyHop(
     .clk(clk_40MHz)
   );
   
-  time_bar my_time_bar (
-    .module_en(time_bar_en),
-    .one_ms_tick(one_ms_tick),
-    .start(timer_start),
-    .vga_bus_in(vga_bus[2]),
-    .vga_bus_out(vga_bus[3]),
-    .elapsed(time_elapsed),
-    .rst(rst),
-    .clk(clk_40MHz)
-  );
-  
   character my_character (
     .module_en(character_en),
     .jump_left(jump_left),
@@ -161,8 +150,19 @@ module SkyHop(
     .jump_fail(jump_fail),
     .one_ms_tick(one_ms_tick),
     .landed(character_landed),
+    .vga_bus_in(vga_bus[2]),
+    .vga_bus_out(vga_bus[3]),
+    .rst(rst),
+    .clk(clk_40MHz)
+  );
+  
+  time_bar my_time_bar (
+    .module_en(time_bar_en),
+    .one_ms_tick(one_ms_tick),
+    .start(timer_start),
     .vga_bus_in(vga_bus[3]),
     .vga_bus_out(vga_bus[4]),
+    .elapsed(time_elapsed),
     .rst(rst),
     .clk(clk_40MHz)
   );

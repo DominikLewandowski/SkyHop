@@ -85,7 +85,7 @@ module blocks(
   end
   
   always@(posedge clk)
-    if(rst) begin
+    if(rst || (module_en == 0)) begin
       character_pos <= 3'b101;
       jump_fail <= 0;
     end
