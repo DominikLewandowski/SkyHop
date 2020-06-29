@@ -35,29 +35,53 @@ module character(
   output wire [`VGA_BUS_SIZE-1:0] vga_bus_out
   );
   
+  wire [`VGA_BUS_SIZE-1:0] vga_bus;
+  
   reg [9:0] character_x, character_x_nxt;       // <0:799>
   reg [9:0] character_y, character_y_nxt;       // <0:599>
   
   reg landed_nxt;
   
   localparam CHARACTER_COLOR = 12'hFF0;
-  localparam CHARACTER_HEIGHT = 60;
-  localparam CHARACTER_WIDTH = 40;
+  localparam CHARACTER_HEIGHT = 70;
+  localparam CHARACTER_WIDTH = 88;
+  localparam SPACE_BLOCK_CHAR = 1;
   
-  localparam CHARACTER_POS_Y = 625 - 100 - CHARACTER_HEIGHT;
+  localparam CHARACTER_POS_Y = 625 - 100 - CHARACTER_HEIGHT - SPACE_BLOCK_CHAR;
   
-  draw_rect #(
-    .RECT_COLOUR(CHARACTER_COLOR),
+  wire [11:0] rgb_char_f_rom, rgb_char_s_rom;
+  wire [13:0] pixel_addres_rom;
+
+  reg fly_flag, fly_flag_nxt;
+  wire [11:0] rgb_pixel = (fly_flag == 1) ? rgb_char_s_rom : rgb_char_f_rom;
+  reg char_mirror, char_mirror_nxt;
+  
+  draw_rect_img #(
     .RECT_WIDTH(CHARACTER_WIDTH),
     .RECT_HEIGHT(CHARACTER_HEIGHT)
-  ) my_draw_rect (
+  ) draw_character (
+    .clk(clk),
+    .rst(rst),
+    .mirror(char_mirror),
     .module_en(module_en),
+    .rgb_pixel(rgb_pixel),
     .xpos(character_x),
     .ypos(character_y),
     .vga_bus_in(vga_bus_in),
-    .vga_bus_out(vga_bus_out),   
-    .pclk(clk),
-    .rst(rst)
+    .vga_bus_out(vga_bus_out),
+    .pixel_addr(pixel_addres_rom)
+  );
+  
+  img_char_f_rom my_char_f_rom (  
+    .address(pixel_addres_rom),
+    .rgb(rgb_char_f_rom),
+    .clk(clk)
+  );
+  
+  img_char_s_rom my_char_s_rom (  
+    .address(pixel_addres_rom),
+    .rgb(rgb_char_s_rom),
+    .clk(clk)
   );
   
   reg [1:0] state, state_nxt;
@@ -74,6 +98,8 @@ module character(
     character_y_nxt = character_y;
     character_x_nxt = character_x;
     one_ms_timer_nxt = one_ms_timer;
+    fly_flag_nxt = fly_flag;
+    char_mirror_nxt = char_mirror;
     landed_nxt = 0;
     
     case(state)
@@ -82,11 +108,14 @@ module character(
       begin 
         state_nxt = jump_fail ? S_FALL : (jump_left ? S_JUMP_L : (jump_right ? S_JUMP_R : state));
         one_ms_timer_nxt = 0;
+        fly_flag_nxt = 0;
       end
         
       S_JUMP_R:
         if( one_ms_tick == 1 )
           begin
+            char_mirror_nxt = 0;
+            fly_flag_nxt = 1;
             character_x_nxt = character_x + 1;
             character_y_nxt = (one_ms_timer < 40) ? character_y - 1 : character_y + 1;
             if( one_ms_timer < 79 ) one_ms_timer_nxt = one_ms_timer + 1;
@@ -100,6 +129,8 @@ module character(
       S_JUMP_L:
         if( one_ms_tick == 1 )
           begin
+            char_mirror_nxt = 1;
+            fly_flag_nxt = 1;
             character_x_nxt = character_x - 1;
             character_y_nxt = (one_ms_timer < 40) ? character_y - 1 : character_y + 1;
             if( one_ms_timer < 79 ) one_ms_timer_nxt = one_ms_timer + 1;
@@ -113,6 +144,7 @@ module character(
        S_FALL:
          if( one_ms_tick == 1 )
            begin
+             fly_flag_nxt = 1;
              character_y_nxt = character_y + 1;
              if( one_ms_timer < 200 ) one_ms_timer_nxt = one_ms_timer + 1;
              else 
@@ -134,6 +166,8 @@ module character(
       state <= S_IDLE;
       landed <= 0;
       one_ms_timer <= 0;
+      fly_flag <= 0;
+      char_mirror <= 0;
     end
     else begin
       character_x <= character_x_nxt;
@@ -141,5 +175,7 @@ module character(
       state <= state_nxt;
       landed <= landed_nxt;
       one_ms_timer <= one_ms_timer_nxt;
+      fly_flag <= fly_flag_nxt;
+      char_mirror <= char_mirror_nxt;
     end    
 endmodule
