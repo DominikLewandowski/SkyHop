@@ -19,15 +19,16 @@
 // 
 //////////////////////////////////////////////////////////////////////////////////
 
-`define S_START         3'b000
-`define S_PREPARE_MAP   3'b001
-`define S_GAME_IDLE     3'b011
-`define S_JUMP_L        3'b010
-`define S_JUMP_R        3'b110
-`define S_CHAR_FLY      3'b111
-`define S_CHAR_FALL     3'b101
-`define S_GAME_END      3'b100
-`define S_WIDTH  3
+`define S_START         4'b0000
+`define S_PREPARE_MAP   4'b0001
+`define S_GAME_IDLE     4'b0011
+`define S_JUMP_L        4'b0010
+`define S_JUMP_R        4'b0110
+`define S_CHAR_FLY      4'b0111
+`define S_CHAR_FALL     4'b0101
+`define S_GAME_END_T    4'b0100
+`define S_GAME_END_F    4'b1100
+`define S_WIDTH  4
 
 module state_machine (
   input wire clk,
@@ -46,15 +47,16 @@ module state_machine (
   output wire bg_clor_select,
   output wire jump_left,
   output wire jump_right,
-  output wire timer_start
+  output wire timer_start,
+  output wire end_text_select
   );
   
   localparam K_LEFT     = 2'b01;  // Left arrow
   localparam K_RIGHT    = 2'b10;  // Right arrow
   localparam K_SPACEBAR = 2'b11;  // Spacebar
   
-  reg [9:0] outputs;
-  assign {start_screen_en, blocks_en, time_bar_en, character_en, points_en, end_screen_en, bg_clor_select, jump_left, jump_right, timer_start} = outputs[9:0];
+  reg [10:0] outputs;
+  assign {start_screen_en, blocks_en, time_bar_en, character_en, points_en, end_screen_en, bg_clor_select, jump_left, jump_right, timer_start, end_text_select} = outputs[10:0];
   
   reg [`S_WIDTH-1:0] state;
   wire [`S_WIDTH-1:0] state_nxt;
@@ -62,15 +64,16 @@ module state_machine (
   
   always @* begin
     case (state)
-      `S_START:          {outputs, next_state} = {10'b1000000000, (key == K_SPACEBAR) ? `S_PREPARE_MAP : `S_START};
-      `S_PREPARE_MAP:    {outputs, next_state} = {10'b1000000000, `S_GAME_IDLE};
-      `S_GAME_IDLE:      {outputs, next_state} = {10'b0111101000, jump_fail ? `S_CHAR_FALL : (time_elapsed ? `S_GAME_END : ((key == K_LEFT) ? `S_JUMP_L : ((key == K_RIGHT) ? `S_JUMP_R : `S_GAME_IDLE)))};
-      `S_JUMP_L:         {outputs, next_state} = {10'b0111101101, `S_CHAR_FLY};
-      `S_JUMP_R:         {outputs, next_state} = {10'b0111101011, `S_CHAR_FLY};
-      `S_CHAR_FLY:       {outputs, next_state} = {10'b0111101001, character_landed ? `S_GAME_IDLE : `S_CHAR_FLY};
-      `S_CHAR_FALL:      {outputs, next_state} = {10'b0111101001, character_landed ? `S_GAME_END : `S_CHAR_FALL};
-      `S_GAME_END:       {outputs, next_state} = {10'b0000010000, (key == K_SPACEBAR) ? `S_START : `S_GAME_END};
-      default:           {outputs, next_state} = {10'b1000000000, (key == K_SPACEBAR) ? `S_PREPARE_MAP : `S_START};
+      `S_START:          {outputs, next_state} = {11'b10000000000, (key == K_SPACEBAR) ? `S_PREPARE_MAP : `S_START};
+      `S_PREPARE_MAP:    {outputs, next_state} = {11'b10000000000, `S_GAME_IDLE};
+      `S_GAME_IDLE:      {outputs, next_state} = {11'b01111010000, jump_fail ? `S_CHAR_FALL : (time_elapsed ? `S_GAME_END_T : ((key == K_LEFT) ? `S_JUMP_L : ((key == K_RIGHT) ? `S_JUMP_R : `S_GAME_IDLE)))};
+      `S_JUMP_L:         {outputs, next_state} = {11'b01111011010, `S_CHAR_FLY};
+      `S_JUMP_R:         {outputs, next_state} = {11'b01111010110, `S_CHAR_FLY};
+      `S_CHAR_FLY:       {outputs, next_state} = {11'b01111010010, character_landed ? `S_GAME_IDLE : `S_CHAR_FLY};
+      `S_CHAR_FALL:      {outputs, next_state} = {11'b01111010010, character_landed ? `S_GAME_END_F : `S_CHAR_FALL};
+      `S_GAME_END_T:     {outputs, next_state} = {11'b00000100000, (key == K_SPACEBAR) ? `S_START : `S_GAME_END_T};
+      `S_GAME_END_F:     {outputs, next_state} = {11'b00000100001, (key == K_SPACEBAR) ? `S_START : `S_GAME_END_F};
+      default:           {outputs, next_state} = {11'b10000000000, (key == K_SPACEBAR) ? `S_PREPARE_MAP : `S_START};
     endcase
   end
   

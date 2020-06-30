@@ -46,7 +46,7 @@ module SkyHop(
   wire layer_select = sw;
   
   wire start_screen_en, blocks_en, time_bar_en, character_en, points_en, end_screen_en;
-  wire bg_clor_select, jump_left, jump_right, jump_fail, timer_start, time_elapsed, character_landed;
+  wire bg_clor_select, jump_left, jump_right, jump_fail, timer_start, time_elapsed, character_landed, end_text_select;
 
   wire one_ms_tick;
   millisecond_timer ms_timer (
@@ -89,7 +89,8 @@ module SkyHop(
     .bg_clor_select(bg_clor_select),
     .jump_left(jump_left),
     .jump_right(jump_right),
-    .timer_start(timer_start)
+    .timer_start(timer_start),
+    .end_text_select(end_text_select)
   );
   
   wire [10:0] vcount, hcount;
@@ -167,19 +168,25 @@ module SkyHop(
     .clk(clk_40MHz)
   );
   
+  wire [11:0] score;
+  
   points my_points (
     .module_en(points_en),
     .increase(character_landed),
     .vga_bus_in(vga_bus[4]),
     .vga_bus_out(vga_bus[5]),
+    .score(score),
     .rst(rst),
     .clk(clk_40MHz)
   );
   
   end_screen my_end_screen (
     .module_en(end_screen_en),
+    .jump_fail(end_text_select),
+    .score(score),
     .vga_bus_in(vga_bus[5]),
     .vga_bus_out(vga_bus[6]),
+    .one_sec_tick(one_sec_tick),
     .rst(rst),
     .clk(clk_40MHz)
   );

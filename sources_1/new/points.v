@@ -28,7 +28,8 @@ module points(
   input wire increase,
 
   input wire [`VGA_BUS_SIZE-1:0] vga_bus_in,
-  output wire [`VGA_BUS_SIZE-1:0] vga_bus_out
+  output wire [`VGA_BUS_SIZE-1:0] vga_bus_out,
+  output wire [11:0] score
   );
   
   wire [3:0] char_line;
@@ -63,6 +64,8 @@ module points(
   reg [3:0] hundred_cnt, hundred_cnt_nxt = 0;
   reg [3:0] ten_cnt, ten_cnt_nxt = 0;
   reg [3:0] one_cnt, one_cnt_nxt = 0;
+  
+  assign score = {hundred_cnt, ten_cnt, one_cnt};
   
   always@*
   begin

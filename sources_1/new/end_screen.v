@@ -25,58 +25,74 @@ module end_screen(
   input wire clk,
   input wire rst,
   input wire module_en,
-
+  input wire jump_fail,
+  input wire one_sec_tick,
+  input wire [11:0] score,
   input wire [`VGA_BUS_SIZE-1:0] vga_bus_in,
   output wire [`VGA_BUS_SIZE-1:0] vga_bus_out
   );
   
-  localparam CHAR_WIDHT = 8;
-  localparam TEXT_POS_X = (`GAME_WIDTH / 2) - ((14 * CHAR_WIDHT * 2) / 2) - 1;
-
-  reg [6:0] char_code;
-  wire [3:0] char_line;
-  wire [7:0] char_xy, char_line_pixels;
+  wire [`VGA_BUS_SIZE-1:0] vga_bus [1:0];
   
-  draw_rect_char #(
-    .TEXT_COLOUR(12'h03A),
-    .FONT_SIZE(2),
-    .TEXT_POS_X(TEXT_POS_X),
-    .TEXT_POS_Y(150),
-    .TEXT_SIZE_X(14),
-    .TEXT_SIZE_Y(1)
-  ) text_unit (
-    .text_en(module_en),
-    .vga_bus_in(vga_bus_in),
-    .char_pixels(char_line_pixels),
-    .vga_bus_out(vga_bus_out),
-    .char_xy(char_xy),
-    .char_line(char_line),
+  reg disp_en, disp_en_nxt;
+  reg [11:0] real_score, real_score_nxt;
+  
+  
+  string_game_end string_1 (
     .clk(clk),
-    .rst(rst)
-  ); 
-    
-  font_rom my_font_rom (
-    .clk(clk),  
-    .addr({char_code, char_line}),       
-    .char_line_pixels(char_line_pixels) 
+    .rst(rst),
+    .module_en(module_en),
+    .jump_fail(jump_fail),
+    .vga_bus_in(vga_bus_in),
+    .vga_bus_out(vga_bus[0])
+  );
+ 
+  string_score_end string_2 (
+    .clk(clk),
+    .rst(rst),
+    .module_en(module_en),
+    .score(real_score),
+    .vga_bus_in(vga_bus[0]),
+    .vga_bus_out(vga_bus[1])
   );
   
-  always@*
-    casex(char_xy)
-      8'h00: char_code = "E"; 
-      8'h10: char_code = "N";
-      8'h20: char_code = "D"; 
-      8'h30: char_code = " "; 
-      8'h40: char_code = "O"; 
-      8'h50: char_code = "F"; 
-      8'h60: char_code = " "; 
-      8'h70: char_code = "T"; 
-      8'h80: char_code = "I"; 
-      8'h90: char_code = "M"; 
-      8'hA0: char_code = "E"; 
-      8'hB0: char_code = " "; 
-      8'hC0: char_code = ":";
-      8'hD0: char_code = "P";
-      default: char_code = 7'h00;
-    endcase   
+  string_spacebar string_3 (
+    .clk(clk),
+    .rst(rst),
+    .module_en(module_en & disp_en),
+    .vga_bus_in(vga_bus[1]),
+    .vga_bus_out(vga_bus_out)
+  );
+
+  always @*
+  if( jump_fail ) begin
+    if( score[3:0] > 0 ) begin
+      real_score_nxt[11:8] = score[11:8];
+      real_score_nxt[7:4]  = score[7:4];
+      real_score_nxt[3:0]  = score[3:0] - 4'b0001;
+    end 
+    else if( score[7:4] > 0 ) begin
+      real_score_nxt[11:8] = score[11:8];
+      real_score_nxt[7:4]  = score[7:4] - 4'b0001;
+      real_score_nxt[3:0]  = 4'b1001;
+    end
+    else begin
+      real_score_nxt[11:8] = score[11:8] - 4'b0001;
+      real_score_nxt[7:4]  = 4'b1001;
+      real_score_nxt[3:0]  = 4'b1001;
+    end
+  end
+  else real_score_nxt = score;
+  
+  always @*
+    if(one_sec_tick) disp_en_nxt = ~disp_en;
+    else disp_en_nxt = disp_en;
+    
+  always @(posedge module_en)
+    real_score <= real_score_nxt;
+  
+  always @(posedge clk)
+    if(rst) disp_en <= 0;
+    else disp_en <= disp_en_nxt;
+
 endmodule
