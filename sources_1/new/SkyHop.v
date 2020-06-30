@@ -149,7 +149,6 @@ module SkyHop(
     .jump_left(jump_left),
     .jump_right(jump_right),
     .jump_fail(jump_fail),
-    .one_ms_tick(one_ms_tick),
     .landed(character_landed),
     .vga_bus_in(vga_bus[2]),
     .vga_bus_out(vga_bus[3]),
