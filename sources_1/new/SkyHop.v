@@ -171,7 +171,7 @@ module SkyHop(
   
   points my_points (
     .module_en(points_en),
-    .increase(character_landed),
+    .increase((character_landed & ~jump_fail)),
     .vga_bus_in(vga_bus[4]),
     .vga_bus_out(vga_bus[5]),
     .score(score),
