@@ -27,7 +27,7 @@ module end_screen(
   input wire module_en,
   input wire jump_fail,
   input wire one_sec_tick,
-  input wire [11:0] score,
+  input wire [11:0] score_in,
   input wire [`VGA_BUS_SIZE-1:0] vga_bus_in,
   output wire [`VGA_BUS_SIZE-1:0] vga_bus_out
   );
@@ -35,8 +35,9 @@ module end_screen(
   wire [`VGA_BUS_SIZE-1:0] vga_bus [1:0];
   
   reg disp_en, disp_en_nxt;
-  reg [11:0] real_score; wire [11:0] real_score_nxt;
-  assign real_score_nxt = score;
+  
+  reg [11:0] score_latched;
+  wire [11:0] score_latched_nxt = (module_en == 0) ? score_in : score_latched;
   
   string_game_end string_1 (
     .clk(clk),
@@ -51,7 +52,7 @@ module end_screen(
     .clk(clk),
     .rst(rst),
     .module_en(module_en),
-    .score(real_score),
+    .score(score_latched),
     .vga_bus_in(vga_bus[0]),
     .vga_bus_out(vga_bus[1])
   );
@@ -63,36 +64,19 @@ module end_screen(
     .vga_bus_in(vga_bus[1]),
     .vga_bus_out(vga_bus_out)
   );
-
-//  always @*
-//  if( jump_fail ) begin
-//    if( score[3:0] > 0 ) begin
-//      real_score_nxt[11:8] = score[11:8];
-//      real_score_nxt[7:4]  = score[7:4];
-//      real_score_nxt[3:0]  = score[3:0] - 4'b0001;
-//    end 
-//    else if( score[7:4] > 0 ) begin
-//      real_score_nxt[11:8] = score[11:8];
-//      real_score_nxt[7:4]  = score[7:4] - 4'b0001;
-//      real_score_nxt[3:0]  = 4'b1001;
-//    end
-//    else begin
-//      real_score_nxt[11:8] = score[11:8] - 4'b0001;
-//      real_score_nxt[7:4]  = 4'b1001;
-//      real_score_nxt[3:0]  = 4'b1001;
-//    end
-//  end
-//  else real_score_nxt = score;
   
   always @*
     if(one_sec_tick) disp_en_nxt = ~disp_en;
     else disp_en_nxt = disp_en;
     
-  always @(posedge module_en)
-    real_score <= real_score_nxt;
-  
   always @(posedge clk)
-    if(rst) disp_en <= 0;
-    else disp_en <= disp_en_nxt;
+    if(rst) begin
+      disp_en <= 0;
+      score_latched <= 0;
+    end
+    else begin
+      disp_en <= disp_en_nxt;
+      score_latched <= score_latched_nxt;
+    end
 
 endmodule

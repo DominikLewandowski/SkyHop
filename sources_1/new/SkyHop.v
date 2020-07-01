@@ -182,7 +182,7 @@ module SkyHop(
   end_screen my_end_screen (
     .module_en(end_screen_en),
     .jump_fail(end_text_select),
-    .score(score),
+    .score_in(score),
     .vga_bus_in(vga_bus[5]),
     .vga_bus_out(vga_bus[6]),
     .one_sec_tick(one_sec_tick),
