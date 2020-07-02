@@ -55,9 +55,11 @@ module blocks(
       shift_layer #(.POS_Y(i)) u_layer(
         .clk(clk),
         .rst(rst),
+        .module_en(module_en),
         .one_ms_tick(one_ms_tick),
         .start(jump_left | jump_right),
-        .layer_map_in(layer_map[i] & {7{module_en}}),
+        .load(1'b0),
+        .layer_map_in(layer_map[i]),
         .block_type_in(block_type[i]),
         .vga_bus_in(vga_bus[i]),
         .vga_bus_out(vga_bus[i+1]),

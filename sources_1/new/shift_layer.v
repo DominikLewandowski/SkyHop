@@ -25,8 +25,10 @@ module shift_layer #(parameter POS_Y = 0)
 (
   input wire clk,
   input wire rst,
+  input wire module_en,
   input wire one_ms_tick,
   input wire start,
+  input wire load,
   input wire [0:6] layer_map_in,
   input wire [0:6] block_type_in,
   input wire [`VGA_BUS_SIZE-1:0] vga_bus_in,
@@ -53,6 +55,7 @@ module shift_layer #(parameter POS_Y = 0)
   (
     .pclk(clk),
     .rst(rst),
+    .module_en(module_en),
     .layer_map(layer_map_in),
     .block_type(block_type_in),
     .rgb_pixel_ground(rgb_ground_rom),
@@ -107,6 +110,7 @@ module shift_layer #(parameter POS_Y = 0)
               shift_y_nxt = shift_y + 1;
               if( one_ms_timer < 149 ) one_ms_timer_nxt = one_ms_timer + 1;
               else state_nxt = S_END;
+              if( load == 1 ) state_nxt = S_END;
             end 
         end
         

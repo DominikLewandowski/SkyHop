@@ -24,6 +24,7 @@ module draw_layer
 (
   input wire pclk,
   input wire rst,
+  input wire module_en,
   input wire [0:6] layer_map,
   input wire [0:6] block_type,
   input wire [11:0] rgb_pixel_ground,
@@ -71,7 +72,9 @@ module draw_layer
   localparam BLOCK_SKY = 2'b10;
   
   always @*
-    if(rect_type_delayed == BLOCK_GROUND)
+    if(module_en == 0) 
+      rgb_out_nxt = rgb_in_delayed;
+    else if(rect_type_delayed == BLOCK_GROUND)
       rgb_out_nxt = (rgb_pixel_ground == 12'hFFF) ? rgb_in_delayed : rgb_pixel_ground;
     else if(rect_type_delayed == BLOCK_SKY)
       rgb_out_nxt = (rgb_pixel_sky == 12'hFFF) ? rgb_in_delayed : rgb_pixel_sky;
