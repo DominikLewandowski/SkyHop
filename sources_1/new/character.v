@@ -85,7 +85,7 @@ module character(
   
   wire movement_tick;
   char_movement_timer #(
-    .TIMER_CONST(16'd65_000)
+    .TIMER_CONST(17'd78_000)
   ) movement_timer (
     .clk_40MHz(clk), 
     .rst(rst),

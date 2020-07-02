@@ -20,7 +20,7 @@
 //////////////////////////////////////////////////////////////////////////////////
 
 
-module char_movement_timer #(parameter TIMER_CONST = 16'd40_000)
+module char_movement_timer #(parameter TIMER_CONST = 17'd40_000)
 (
   input wire clk_40MHz, 
   input wire rst,
@@ -28,14 +28,14 @@ module char_movement_timer #(parameter TIMER_CONST = 16'd40_000)
 );
 
   reg movement_tick_nxt = 0;
-  reg [15:0] counter, counter_nxt = 0;
+  reg [17:0] counter, counter_nxt = 0;
   
   always@*
   begin
     if( counter >= (TIMER_CONST-1) ) 
       begin
         movement_tick_nxt = 1'b1;
-        counter_nxt = 16'h0000;
+        counter_nxt = 17'h0000;
       end
     else
       begin 

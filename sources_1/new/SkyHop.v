@@ -24,7 +24,6 @@
 module SkyHop(
   input wire rst,
   input wire clk,
-  input wire sw,
   input wire btnU, btnL, btnR,
   output wire vs,
   output wire hs,
@@ -42,8 +41,6 @@ module SkyHop(
     .locked(locked),
     .clk(clk)                // Clock in ports
   );
-  
-  wire layer_select = sw;
   
   wire start_screen_en, blocks_en, time_bar_en, character_en, points_en, end_screen_en;
   wire bg_clor_select, jump_left, jump_right, jump_fail, timer_start, time_elapsed, character_landed, end_text_select, map_ready;
@@ -134,7 +131,8 @@ module SkyHop(
   
   wire [0:6] layer_map, block_type;
   block_generator block_gen (
-    .layer_select(layer_select),
+    .clk(clk_40MHz),
+    .generate_map(jump_left | jump_right),
     .layer_map(layer_map),
     .block_type(block_type),
     .map_ready(map_ready)

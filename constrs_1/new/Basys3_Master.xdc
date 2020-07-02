@@ -39,7 +39,6 @@ set_property IOSTANDARD LVCMOS33 [get_ports {b[2]}]
 set_property PACKAGE_PIN J18 [get_ports {b[3]}]
 set_property IOSTANDARD LVCMOS33 [get_ports {b[3]}]
 
-
 # Constraints for CFGBVS
 set_property CFGBVS VCCO [current_design]
 set_property CONFIG_VOLTAGE 3.3 [current_design]
@@ -48,10 +47,6 @@ set_property CONFIG_VOLTAGE 3.3 [current_design]
 set_property PACKAGE_PIN U18 [get_ports rst]						
 set_property IOSTANDARD LVCMOS33 [get_ports rst]
 
-# Switches
-set_property PACKAGE_PIN V17 [get_ports sw]					
-set_property IOSTANDARD LVCMOS33 [get_ports sw]
-
 #Buttons
 set_property PACKAGE_PIN T18 [get_ports btnU]						
 set_property IOSTANDARD LVCMOS33 [get_ports btnU]
@@ -59,5 +54,3 @@ set_property PACKAGE_PIN W19 [get_ports btnL]
 set_property IOSTANDARD LVCMOS33 [get_ports btnL]
 set_property PACKAGE_PIN T17 [get_ports btnR]						
 set_property IOSTANDARD LVCMOS33 [get_ports btnR]
-#set_property PACKAGE_PIN U17 [get_ports btnD]						
-#set_property IOSTANDARD LVCMOS33 [get_ports btnD]
