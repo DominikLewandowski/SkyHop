@@ -36,7 +36,7 @@ module lfsr113_tb();
    lfsr113 my_random (
      .clk(clk), 
      .reset(rst),
-     .enable_p(1'b1),
+     .enable(1'b1),
      .lfsr113_prng(number_out)
   );
   

@@ -23,30 +23,26 @@
 module lfsr113(
   input wire clk, 
   input wire reset,
-  input wire enable_p,
-  output reg [31:0] lfsr113_prng
+  input wire enable,
+  output wire [31:0] lfsr113_prng
  );
  
-  parameter CI_S0 = 1'b0, CI_IDLE = 1'b1;
+  localparam CI_S0 = 1'b0, CI_IDLE = 1'b1;
+  localparam SEED = 32'd987654321;
   
-  reg [31:0] z1, z2, z3, z4;
-  reg [31:0] z1_nxt, z2_nxt, z3_nxt, z4_nxt;
-  wire [31:0] lfsr113_prng_nxt;
+  reg [31:0] z1, z2, z3, z4, z1_nxt, z2_nxt, z3_nxt, z4_nxt;
   reg state, state_nxt;
   
-  assign lfsr113_prng_nxt = (state == CI_S0) ? (z1 ^ z2 ^ z3 ^ z4) : lfsr113_prng;
+  assign lfsr113_prng = (z1 ^ z2 ^ z3 ^ z4);
   
    always @(posedge clk) begin
-     if (reset) begin
-       state <= CI_IDLE;
-     end else begin
-       state <= state_nxt;
-     end
+     if (reset) state <= CI_IDLE;
+     else state <= state_nxt;
    end
   
    always @* begin
      case (state)
-       CI_IDLE: state_nxt = (enable_p == 1'b0) ? CI_IDLE : CI_S0;
+       CI_IDLE: state_nxt = (enable == 1'b1) ? CI_S0 : CI_IDLE;
        CI_S0: state_nxt = CI_S0;
        default: state_nxt = CI_IDLE;
      endcase
@@ -69,16 +65,13 @@ module lfsr113(
     endcase
    end
 
-
    always @(posedge clk ) begin
      if (reset) begin
-       lfsr113_prng <= 32'b0;
-       z1 <= 32'd987654321;
-       z2 <= 32'd987654321; 
-       z3 <= 32'd987654321; 
-       z4 <= 32'd987654321;
+       z1 <= SEED;
+       z2 <= SEED; 
+       z3 <= SEED; 
+       z4 <= SEED;
      end else begin
-       lfsr113_prng <= lfsr113_prng_nxt;
        z1 <= z1_nxt; 
        z2 <= z2_nxt; 
        z3 <= z3_nxt; 
@@ -87,3 +80,4 @@ module lfsr113(
    end
   
  endmodule
+ 
