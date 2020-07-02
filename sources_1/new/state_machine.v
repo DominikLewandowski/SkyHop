@@ -34,6 +34,7 @@ module state_machine (
   input wire clk,
   input wire rst,
   input wire [1:0] key,
+  input wire map_ready,
   input wire jump_fail,
   input wire time_elapsed,
   input wire character_landed,
@@ -65,7 +66,7 @@ module state_machine (
   always @* begin
     case (state)
       `S_START:          {outputs, next_state} = {11'b10000000000, (key == K_SPACEBAR) ? `S_PREPARE_MAP : `S_START};
-      `S_PREPARE_MAP:    {outputs, next_state} = {11'b10000000000, `S_GAME_IDLE};
+      `S_PREPARE_MAP:    {outputs, next_state} = {11'b10000000000, map_ready ? `S_GAME_IDLE : `S_PREPARE_MAP};
       `S_GAME_IDLE:      {outputs, next_state} = {11'b01111010000, jump_fail ? `S_CHAR_FALL : (time_elapsed ? `S_GAME_END_T : ((key == K_LEFT) ? `S_JUMP_L : ((key == K_RIGHT) ? `S_JUMP_R : `S_GAME_IDLE)))};
       `S_JUMP_L:         {outputs, next_state} = {11'b01111011010, `S_CHAR_FLY};
       `S_JUMP_R:         {outputs, next_state} = {11'b01111010110, `S_CHAR_FLY};

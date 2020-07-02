@@ -46,7 +46,7 @@ module SkyHop(
   wire layer_select = sw;
   
   wire start_screen_en, blocks_en, time_bar_en, character_en, points_en, end_screen_en;
-  wire bg_clor_select, jump_left, jump_right, jump_fail, timer_start, time_elapsed, character_landed, end_text_select;
+  wire bg_clor_select, jump_left, jump_right, jump_fail, timer_start, time_elapsed, character_landed, end_text_select, map_ready;
 
   wire one_ms_tick;
   millisecond_timer ms_timer (
@@ -77,6 +77,7 @@ module SkyHop(
     .clk(clk_40MHz),
     .rst(rst),
     .key(key_code),
+    .map_ready(map_ready),
     .jump_fail(jump_fail),
     .time_elapsed(time_elapsed),
     .character_landed(character_landed),
@@ -131,12 +132,21 @@ module SkyHop(
     .clk(clk_40MHz)
   );
   
-  blocks my_blocks (
+  wire [0:6] layer_map, block_type;
+  block_generator block_gen (
     .layer_select(layer_select),
+    .layer_map(layer_map),
+    .block_type(block_type),
+    .map_ready(map_ready)
+  );
+  
+  blocks my_blocks (
     .one_ms_tick(one_ms_tick),
     .module_en(blocks_en),
     .jump_left(jump_left),
     .jump_right(jump_right),
+    .layer_map_in(layer_map),
+    .block_type_in(block_type),
     .vga_bus_in(vga_bus[1]),
     .vga_bus_out(vga_bus[2]),
     .jump_fail(jump_fail),

@@ -25,10 +25,11 @@ module blocks(
   input wire clk,
   input wire rst,
   input wire module_en,
-  input wire layer_select,
   input wire one_ms_tick,
   input wire jump_left,
   input wire jump_right,
+  input wire [0:6] layer_map_in,
+  input wire [0:6] block_type_in,
   input wire [`VGA_BUS_SIZE-1:0] vga_bus_in,
   output wire [`VGA_BUS_SIZE-1:0] vga_bus_out,
   output reg jump_fail
@@ -39,14 +40,11 @@ module blocks(
   wire [0:6] layer_map [NUM_MODULES:0];
   wire [0:6] block_type [NUM_MODULES:0];
   
+  assign layer_map[0] = layer_map_in;
+  assign block_type[0] = block_type_in;
+  
   assign vga_bus[0] = vga_bus_in;
   assign vga_bus_out = vga_bus[NUM_MODULES];
-  
-  block_generator block_gen (
-    .layer_select(layer_select),
-    .layer_map(layer_map[0]),
-    .block_type(block_type[0])
-  );
   
   genvar i;
   generate
