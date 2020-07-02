@@ -54,7 +54,7 @@ module SkyHop(
     .rst(rst),
     .one_milli_tick(one_ms_tick)
   );
-  
+
   wire one_sec_tick;
   one_second_timer sec_timer (
     .clk(clk_40MHz), 
