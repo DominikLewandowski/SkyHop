@@ -37,7 +37,7 @@ module shift_layer #(parameter POS_Y = 0)
   output reg [0:6] block_type_out
  );
     
-  wire [11:0] rgb_ground_rom, rgb_sky_rom;
+  wire [11:0] rgb_ground_rom, rgb_cloud_rom;
   wire [13:0] pixel_addres_rom;
   
   reg [7:0] shift_y, shift_y_nxt;
@@ -59,7 +59,7 @@ module shift_layer #(parameter POS_Y = 0)
     .layer_map(layer_map_in),
     .block_type(block_type_in),
     .rgb_pixel_ground(rgb_ground_rom),
-    .rgb_pixel_sky(rgb_sky_rom),
+    .rgb_pixel_cloud(rgb_cloud_rom),
     .ypos((shift_y + y_offset)),
     .vga_bus_in(vga_bus_in),
     .vga_bus_out(vga_bus_out),
@@ -72,9 +72,9 @@ module shift_layer #(parameter POS_Y = 0)
     .clk(clk)
   );
     
-  img_sky_rom my_image_sky (  
+  img_cloud_rom my_image_cloud (  
     .address(pixel_addres_rom),
-    .rgb(rgb_sky_rom),
+    .rgb(rgb_cloud_rom),
     .clk(clk)
   );
   

@@ -3,9 +3,9 @@
 // Company: 
 // Engineer: 
 // 
-// Create Date: 12.05.2020 14:52:08
+// Create Date: 04.07.2020 15:17:25
 // Design Name: 
-// Module Name: img_sky_rom
+// Module Name: img_cloud_rom
 // Project Name: 
 // Target Devices: 
 // Tool Versions: 
@@ -20,16 +20,15 @@
 //////////////////////////////////////////////////////////////////////////////////
 
 
-module img_sky_rom(
+module img_cloud_rom(
   input wire clk ,
   input wire [13:0] address,  // address = {addry[7:0], addrx[7:0]}
   output reg [11:0] rgb
 );
 
-
   reg [11:0] rom [0:16383];
 
-  initial $readmemh("../../img_block_sky.data", rom); 
+  initial $readmemh("../../img_block_cloud.data", rom); 
 
   always @(posedge clk)
     rgb <= rom[address];
