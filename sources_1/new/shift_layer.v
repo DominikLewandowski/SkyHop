@@ -84,8 +84,7 @@ module shift_layer #(parameter POS_Y = 0)
   
   reg [1:0] state, state_nxt = S_IDLE;
 
-
-  always@*
+  always @(*)
   begin
     layer_map_out_nxt = layer_map_out;
     block_type_out_nxt = block_type_out;
@@ -101,7 +100,7 @@ module shift_layer #(parameter POS_Y = 0)
           block_type_out_nxt = block_type_in;
         end 
         else if( start == 1 ) 
-          begin 
+          begin
             state_nxt = S_SCROLLING;
             one_ms_timer_nxt = 0;
             shift_y_nxt = 0;
@@ -129,21 +128,19 @@ module shift_layer #(parameter POS_Y = 0)
     endcase
   end
   
-  always@(posedge clk)
-  if(rst)
-  begin
-    layer_map_out <= 0;
-    block_type_out <= 0;
-    one_ms_timer <= 0;
-    shift_y <= 0;
-    state <= S_IDLE;
-  end
-  else 
-  begin
-    layer_map_out <= layer_map_out_nxt;
-    block_type_out <= block_type_out_nxt;
-    one_ms_timer <= one_ms_timer_nxt;
-    shift_y <= shift_y_nxt;
-    state <= state_nxt;
-  end
+  always @( posedge clk )
+    if(rst) begin
+      layer_map_out <= 0;
+      block_type_out <= 0;
+      one_ms_timer <= 0;
+      shift_y <= 0;
+      state <= S_IDLE;
+    end
+    else begin
+      layer_map_out <= layer_map_out_nxt;
+      block_type_out <= block_type_out_nxt;
+      one_ms_timer <= one_ms_timer_nxt;
+      shift_y <= shift_y_nxt;
+      state <= state_nxt;
+    end
 endmodule

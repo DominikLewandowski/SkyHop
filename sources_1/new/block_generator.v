@@ -43,7 +43,7 @@ module block_generator(
 
   reg [0:6] layer_map_nxt, block_type_nxt; 
   
-  always @* begin
+  always @(*) begin
     state_nxt = state;
     load_layer_nxt = 0;
     layer_map_nxt = 7'b0000000;
@@ -83,7 +83,7 @@ module block_generator(
   
   end
   
-  always @(posedge clk) begin
+  always @( posedge clk ) begin
     if(rst) begin
       state <= S_START;
       layer_map <= 7'b0000000;

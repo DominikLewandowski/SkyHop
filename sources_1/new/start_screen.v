@@ -60,10 +60,10 @@ module start_screen(
 );
   
   always @*
-    if(one_sec_tick) disp_en_nxt = ~disp_en;
+    if( one_sec_tick ) disp_en_nxt = ~disp_en;
     else disp_en_nxt = disp_en;
   
-  always @(posedge clk)
+  always @( posedge clk )
     disp_en <= disp_en_nxt;
 
 endmodule

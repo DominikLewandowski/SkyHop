@@ -46,14 +46,15 @@ module character(
   localparam CHARACTER_WIDTH = 88;
   localparam SPACE_BLOCK_CHAR = 1;
   
+  localparam CHARACTER_POS_X = (`GAME_WIDTH / 2) - (CHARACTER_WIDTH / 2) - 1;
   localparam CHARACTER_POS_Y = 625 - 100 - CHARACTER_HEIGHT - SPACE_BLOCK_CHAR;
   
   wire [11:0] rgb_char_f_rom, rgb_char_s_rom;
   wire [13:0] pixel_addres_rom;
 
   reg fly_flag, fly_flag_nxt;
-  wire [11:0] rgb_pixel = (fly_flag == 1) ? rgb_char_s_rom : rgb_char_f_rom;
   reg char_mirror, char_mirror_nxt;
+  wire [11:0] rgb_pixel = (fly_flag == 1) ? rgb_char_s_rom : rgb_char_f_rom;
   
   draw_rect_img #(
     .RECT_WIDTH(CHARACTER_WIDTH),
@@ -100,7 +101,7 @@ module character(
   
   reg [7:0] timer, timer_nxt;
   
-  always @*
+  always @(*)
   begin
     state_nxt = state;
     character_y_nxt = character_y;
@@ -110,7 +111,7 @@ module character(
     char_mirror_nxt = char_mirror;
     landed_nxt = 0;
     
-    case(state)
+    case( state )
     
       S_IDLE:
       begin 
@@ -162,14 +163,13 @@ module character(
                end
             end  
 
-        
       default: state_nxt = S_IDLE;
     endcase
   end    
 
-  always@(posedge clk)
+  always @( posedge clk )
     if (rst || (module_en == 0)) begin
-      character_x <= (`GAME_WIDTH/2)-(CHARACTER_WIDTH/2)-1;
+      character_x <= CHARACTER_POS_X;
       character_y <= CHARACTER_POS_Y;
       state <= S_IDLE;
       landed <= 0;

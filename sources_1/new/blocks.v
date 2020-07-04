@@ -43,7 +43,6 @@ module blocks(
   
   reg [0:6] layer_map_latched, layer_map_latched_nxt;
   reg [0:6] block_type_latched, block_type_latched_nxt;
-  
   reg load_layer_delayed, load_layer_delayed_nxt; 
   
   assign layer_map[0] = layer_map_latched;
@@ -75,7 +74,7 @@ module blocks(
   reg [3:0] character_pos, character_pos_nxt = 3'b101;
   reg jump_fail_nxt = 0;
   
-  always@*
+  always @(*)
   begin
     jump_fail_nxt = jump_fail;
     character_pos_nxt = character_pos;
@@ -103,18 +102,17 @@ module blocks(
     end
   end
   
-  always @(posedge clk) begin
+  always @( posedge clk ) begin
     layer_map_latched <= layer_map_latched_nxt;
     block_type_latched <= block_type_latched_nxt;
     load_layer_delayed <= load_layer_delayed_nxt;
   end
   
-  always@(posedge clk)
+  always @( posedge clk )
     if(rst || (module_en == 0)) begin
       character_pos <= 3'b101;
       jump_fail <= 0;
-    end
-    else begin
+    end else begin
       character_pos <= character_pos_nxt;
       jump_fail <= jump_fail_nxt;
     end

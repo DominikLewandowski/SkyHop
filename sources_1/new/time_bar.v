@@ -53,18 +53,15 @@ module time_bar(
   
   reg [(MS_PER_PIXEL_BIT-1):0] time_counter, time_counter_nxt = 0;
   reg [9:0] pixel_counter, pixel_counter_nxt = 0;
-
   
-  localparam  [1:0]
-              S_IDLE    = 2'b00,
-              S_ENABLE  = 2'b01,
-              S_STARTED = 2'b10,
-              S_STOPPED = 2'b11;
+  localparam  [1:0] S_IDLE    = 2'b00,
+                    S_ENABLE  = 2'b01,
+                    S_STARTED = 2'b10,
+                    S_STOPPED = 2'b11;
   
   reg [1:0] state, state_nxt = S_IDLE; 
   
-  
-  always@(posedge clk)
+  always @( posedge clk )
     if (rst) begin
       hcount_out <= 0;
       vcount_out <=  0; 
@@ -88,7 +85,7 @@ module time_bar(
       elapsed <= elapsed_nxt;
     end  
   
-  always @*
+  always @(*)
   begin
     rgb_out_nxt = rgb_in;
     pixel_counter_nxt = pixel_counter;
@@ -96,7 +93,7 @@ module time_bar(
     state_nxt = state;
     elapsed_nxt = 1'b0;
     
-    case(state)
+    case( state )
     
       S_IDLE:
         if(module_en == 1) state_nxt = S_ENABLE;

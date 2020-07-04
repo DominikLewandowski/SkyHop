@@ -50,20 +50,21 @@ module draw_background(
       else if( color_select == 0 ) rgb_out_nxt = `BG_COLOR_L;
       else rgb_out_nxt = `BG_COLOR_D;
     end
-    
+  
   always@(posedge clk)
     if (rst) begin
-      hcount_out <=  0; 
+      hcount_out <= 0;
       vcount_out <= 0;
-      hsync_out <=  0;
-      vsync_out <=  0;
-      rgb_out <=  0; 
+      hsync_out <= 0;
+      vsync_out <= 0;
+      rgb_out <= 0;
     end
     else begin
-      hcount_out <= hcount_out_nxt; 
+      hcount_out <= hcount_out_nxt;
       vcount_out <= vcount_out_nxt;
       hsync_out <= hsync_out_nxt;
       vsync_out <= vsync_out_nxt;
       rgb_out <= rgb_out_nxt;
     end
+    
 endmodule

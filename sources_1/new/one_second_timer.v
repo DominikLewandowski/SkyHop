@@ -27,12 +27,12 @@ module one_second_timer(
   output reg one_sec_tick
   );
   
-  localparam TIMER_CONST = 10'd1_000;    // 40 000 * 25ns = 1ms
+  localparam TIMER_CONST = 10'd1_000;
   
-  reg one_sec_tick_nxt = 0;
-  reg [9:0] counter, counter_nxt = 0;
+  reg one_sec_tick_nxt = 1'b0;
+  reg [9:0] counter, counter_nxt = 10'd0;
   
-  always@*
+  always @(*)
   begin
     if( counter >= (TIMER_CONST-1) ) 
       begin
@@ -42,21 +42,19 @@ module one_second_timer(
     else
       begin 
         one_sec_tick_nxt = 1'b0;
-        counter_nxt = (one_milli_tick) ? counter + 1 : counter;
+        counter_nxt = (one_milli_tick) ? (counter + 1) : counter;
       end
   end
   
-  always@ (posedge clk)
+  always @( posedge clk )
   begin
-    if(rst)
-      begin
-        one_sec_tick <= 0;
-        counter <= 0;
-      end
-    else
-      begin
-        one_sec_tick <= one_sec_tick_nxt;
-        counter <= counter_nxt;
-      end
+    if(rst) begin
+      one_sec_tick <= 1'b0;
+      counter <= 10'd0;
+    end else begin
+      one_sec_tick <= one_sec_tick_nxt;
+      counter <= counter_nxt;
+    end
   end
+  
 endmodule

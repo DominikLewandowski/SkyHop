@@ -42,11 +42,10 @@ module vga_timing (
   assign vsync = ((vga_V_cnt >= 601) & (vga_V_cnt < 605));
   assign vblnk = (vga_V_cnt >= 600);
 
-    
   always @*
     if (vga_H_cnt == 1055) begin
       vga_H_nxt = 0;
-      vga_V_nxt = (vga_V_cnt == 627) ? 0 : vga_V_cnt + 1;
+      vga_V_nxt = (vga_V_cnt == 627) ? 0 : (vga_V_cnt + 1);
     end
     else begin
       vga_H_nxt = vga_H_cnt + 1;

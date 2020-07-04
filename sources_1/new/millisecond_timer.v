@@ -28,10 +28,10 @@ module millisecond_timer(
   
   localparam TIMER_CONST = 16'd40_000;    // 40 000 * 25ns = 1ms
   
-  reg one_milli_tick_nxt = 0;
-  reg [15:0] counter, counter_nxt = 0;
+  reg one_milli_tick_nxt = 1'b0;
+  reg [15:0] counter, counter_nxt = 16'h0000;
   
-  always@*
+  always @(*)
   begin
     if( counter >= (TIMER_CONST-1) ) 
       begin
@@ -45,18 +45,15 @@ module millisecond_timer(
       end
   end
   
-  always@ (posedge clk_40MHz)
+  always @( posedge clk_40MHz )
   begin
-    if(rst)
-      begin
-        one_milli_tick <= 0;
-        counter <= 0;
-      end
-    else
-      begin
-        one_milli_tick <= one_milli_tick_nxt;
-        counter <= counter_nxt;
-      end
+    if(rst) begin
+      one_milli_tick <= 1'b0;
+      counter <= 16'h0000;
+    end else begin
+      one_milli_tick <= one_milli_tick_nxt;
+      counter <= counter_nxt;
+    end
   end
   
 endmodule

@@ -64,8 +64,8 @@ module string_spacebar(
     .char_line_pixels(char_line_pixels) 
   );    
 
-  always@*
-    casex(char_xy)
+  always @(*)
+    casex( char_xy )
       8'h00: char_code = "["; 
       8'h10: char_code = "P";
       8'h20: char_code = "r"; 

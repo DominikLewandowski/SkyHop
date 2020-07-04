@@ -59,13 +59,13 @@ module string_game_info(
   ); 
       
   font_rom my_font_rom (
-    .clk(clk),  
-    .addr({char_code, char_line}),       
-    .char_line_pixels(char_line_pixels) 
+    .clk(clk),
+    .addr({char_code, char_line}),  
+    .char_line_pixels(char_line_pixels)
   );
       
-  always@*
-    casex(char_xy)
+  always @(*)
+    casex( char_xy )
       8'h00: char_code = "U"; 
       8'h10: char_code = "s";
       8'h20: char_code = "e"; 
@@ -149,4 +149,5 @@ module string_game_info(
          
       default: char_code = 7'h00;
     endcase
+    
   endmodule

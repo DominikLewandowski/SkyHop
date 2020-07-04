@@ -30,12 +30,12 @@ module char_movement_timer #(parameter TIMER_CONST = 17'd40_000)
   reg movement_tick_nxt = 0;
   reg [17:0] counter, counter_nxt = 0;
   
-  always@*
+  always @(*)
   begin
     if( counter >= (TIMER_CONST-1) ) 
       begin
         movement_tick_nxt = 1'b1;
-        counter_nxt = 17'h0000;
+        counter_nxt = 18'h0000;
       end
     else
       begin 
@@ -48,8 +48,8 @@ module char_movement_timer #(parameter TIMER_CONST = 17'd40_000)
   begin
     if(rst)
       begin
-        movement_tick <= 0;
-        counter <= 0;
+        movement_tick <= 1'b0;
+        counter <= 18'h0000;
       end
     else
       begin

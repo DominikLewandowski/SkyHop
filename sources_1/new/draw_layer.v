@@ -140,21 +140,21 @@ module draw_layer
         end
     end
   
-  always@(posedge pclk)
-  if (rst) begin
-    hcount_out <= 0;
-    vcount_out <= 0; 
-    hsync_out <= 0;
-    vsync_out <= 0;
-    pixel_addr <= 0;
-    rgb_out <= 0; 
-  end
-  else begin  
-    hcount_out <= hcount_out_nxt;
-    vcount_out <= vcount_out_nxt; 
-    hsync_out <= hsync_out_nxt;
-    vsync_out <= vsync_out_nxt;
-    pixel_addr <= pixel_addr_nxt;
-    rgb_out <= rgb_out_nxt;
-  end
+  always @( posedge pclk )
+    if (rst) begin
+      hcount_out <= 0;
+      vcount_out <= 0; 
+      hsync_out <= 0;
+      vsync_out <= 0;
+      pixel_addr <= 0;
+      rgb_out <= 0; 
+    end
+    else begin  
+      hcount_out <= hcount_out_nxt;
+      vcount_out <= vcount_out_nxt; 
+      hsync_out <= hsync_out_nxt;
+      vsync_out <= vsync_out_nxt;
+      pixel_addr <= pixel_addr_nxt;
+      rgb_out <= rgb_out_nxt;
+    end
 endmodule

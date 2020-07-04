@@ -38,8 +38,8 @@ module keyboard(
  btn_debounce my_db_3( .clk(clk), .reset(rst), .sw(btnR), .db_level(), .db_tick(btnR_tick));
  
  assign key_code =  btnU_tick ? 2'b11 : 
-                            btnL_tick ? 2'b01 :
-                            btnR_tick ? 2'b10 : 2'b00;
+                    btnL_tick ? 2'b01 :
+                    btnR_tick ? 2'b10 : 2'b00;
  // ------------------------------------------------------------------------------------- // 
  
 endmodule

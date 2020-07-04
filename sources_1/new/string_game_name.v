@@ -57,15 +57,15 @@ module string_game_name(
     .clk(clk),
     .rst(rst)
   ); 
-      
+  
   font_rom my_font_rom (
-    .clk(clk),  
-    .addr({char_code, char_line}),       
-    .char_line_pixels(char_line_pixels) 
+    .clk(clk),
+    .addr({char_code, char_line}),    
+    .char_line_pixels(char_line_pixels)
   );    
   
-  always@*
-    casex(char_xy)
+  always @(*)
+    casex( char_xy )
       8'h00: char_code = "S"; 
       8'h10: char_code = "k";
       8'h20: char_code = "y"; 

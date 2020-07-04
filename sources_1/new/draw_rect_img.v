@@ -65,7 +65,7 @@ module draw_rect_img
     .dout ({rect_disp_flag_delayed, vcount_out_nxt, vsync_out_nxt, hcount_out_nxt, hsync_out_nxt, rgb_in_delayed})
   );
 
-  always @*
+  always @(*)
     begin
       if (((hcount_in >=  xpos) && (hcount_in < (xpos + RECT_WIDTH))) && ((vcount_in >=  ypos) && (vcount_in < (ypos + RECT_HEIGHT))) ) begin 
         relative_x = (mirror == 1) ? (RECT_WIDTH - (hcount_in - xpos) - 1) : (hcount_in - xpos);      
@@ -79,7 +79,7 @@ module draw_rect_img
       end
     end
   
-  always@(posedge clk)
+  always @( posedge clk )
     if (rst) begin
       hcount_out <= 0;
       vcount_out <= 0; 

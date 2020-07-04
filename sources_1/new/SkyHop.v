@@ -20,7 +20,6 @@
 // 
 //////////////////////////////////////////////////////////////////////////////////
 
-
 module SkyHop(
   input wire rst,
   input wire clk,
@@ -44,33 +43,33 @@ module SkyHop(
   
   wire start_screen_en, blocks_en, time_bar_en, character_en, points_en, end_screen_en;
   wire bg_clor_select, jump_left, jump_right, jump_fail, timer_start, time_elapsed, character_landed, end_text_select, map_ready;
-
+  wire layer_generate;
+  
   wire one_ms_tick;
   millisecond_timer ms_timer (
-    .clk_40MHz(clk_40MHz), 
+    .clk_40MHz(clk_40MHz),
     .rst(rst),
     .one_milli_tick(one_ms_tick)
   );
 
   wire one_sec_tick;
   one_second_timer sec_timer (
-    .clk(clk_40MHz), 
+    .clk(clk_40MHz),
     .rst(rst),
     .one_milli_tick(one_ms_tick),
     .one_sec_tick(one_sec_tick)
   );
-  
+
   wire [1:0] key_code;
   keyboard my_keyboard(
     .clk(clk_40MHz),
     .rst(rst),
-    .btnU(btnU), 
-    .btnL(btnL), 
+    .btnU(btnU),
+    .btnL(btnL),
     .btnR(btnR),
     .key_code(key_code)
    );
-  
-  wire layer_generate;
+
   state_machine FSM (
     .clk(clk_40MHz),
     .rst(rst),
