@@ -28,6 +28,7 @@ module blocks(
   input wire one_ms_tick,
   input wire jump_left,
   input wire jump_right,
+  input wire load_layer,
   input wire [0:6] layer_map_in,
   input wire [0:6] block_type_in,
   input wire [`VGA_BUS_SIZE-1:0] vga_bus_in,
@@ -42,6 +43,8 @@ module blocks(
   
   reg [0:6] layer_map_latched, layer_map_latched_nxt;
   reg [0:6] block_type_latched, block_type_latched_nxt;
+  
+  reg load_layer_delayed, load_layer_delayed_nxt; 
   
   assign layer_map[0] = layer_map_latched;
   assign block_type[0] = block_type_latched;
@@ -58,7 +61,7 @@ module blocks(
         .module_en(module_en),
         .one_ms_tick(one_ms_tick),
         .start(jump_left | jump_right),
-        .load(1'b0),
+        .load(load_layer_delayed),
         .layer_map_in(layer_map[i]),
         .block_type_in(block_type[i]),
         .vga_bus_in(vga_bus[i]),
@@ -78,6 +81,13 @@ module blocks(
     character_pos_nxt = character_pos;
     layer_map_latched_nxt = layer_map_latched;
     block_type_latched_nxt =  block_type_latched;
+    load_layer_delayed_nxt = 0;
+    
+    if(load_layer) begin
+      layer_map_latched_nxt = layer_map_in;
+      block_type_latched_nxt =  block_type_in;
+      load_layer_delayed_nxt = 1;
+    end
     
     if(jump_left) begin
       layer_map_latched_nxt = layer_map_in;
@@ -93,18 +103,20 @@ module blocks(
     end
   end
   
+  always @(posedge clk) begin
+    layer_map_latched <= layer_map_latched_nxt;
+    block_type_latched <= block_type_latched_nxt;
+    load_layer_delayed <= load_layer_delayed_nxt;
+  end
+  
   always@(posedge clk)
     if(rst || (module_en == 0)) begin
       character_pos <= 3'b101;
       jump_fail <= 0;
-      layer_map_latched <= 0;
-      block_type_latched <= 0;
     end
     else begin
       character_pos <= character_pos_nxt;
       jump_fail <= jump_fail_nxt;
-      layer_map_latched <= layer_map_latched_nxt;
-      block_type_latched <= block_type_latched_nxt;
     end
 
 endmodule

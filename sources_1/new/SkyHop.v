@@ -70,6 +70,7 @@ module SkyHop(
     .key_code(key_code)
    );
   
+  wire layer_generate;
   state_machine FSM (
     .clk(clk_40MHz),
     .rst(rst),
@@ -88,7 +89,8 @@ module SkyHop(
     .jump_left(jump_left),
     .jump_right(jump_right),
     .timer_start(timer_start),
-    .end_text_select(end_text_select)
+    .end_text_select(end_text_select),
+    .layer_generate(layer_generate)
   );
   
   wire [10:0] vcount, hcount;
@@ -130,12 +132,15 @@ module SkyHop(
   );
   
   wire [0:6] layer_map, block_type;
+  wire load_layer;
   block_generator block_gen (
-    .clk(clk_40MHz),
-    .generate_map(jump_left | jump_right),
+    .generate_map(layer_generate),
     .layer_map(layer_map),
     .block_type(block_type),
-    .map_ready(map_ready)
+    .load_layer(load_layer),
+    .map_ready(map_ready),
+    .rst(rst | end_screen_en),
+    .clk(clk_40MHz)
   );
   
   blocks my_blocks (
@@ -143,6 +148,7 @@ module SkyHop(
     .module_en(blocks_en),
     .jump_left(jump_left),
     .jump_right(jump_right),
+    .load_layer(load_layer),
     .layer_map_in(layer_map),
     .block_type_in(block_type),
     .vga_bus_in(vga_bus[1]),

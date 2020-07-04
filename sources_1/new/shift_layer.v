@@ -96,7 +96,11 @@ module shift_layer #(parameter POS_Y = 0)
     case(state)
   
       S_IDLE:
-        if( start == 1 ) 
+        if( load == 1 ) begin
+          layer_map_out_nxt = layer_map_in;
+          block_type_out_nxt = block_type_in;
+        end 
+        else if( start == 1 ) 
           begin 
             state_nxt = S_SCROLLING;
             one_ms_timer_nxt = 0;
@@ -110,7 +114,6 @@ module shift_layer #(parameter POS_Y = 0)
               shift_y_nxt = shift_y + 1;
               if( one_ms_timer < 149 ) one_ms_timer_nxt = one_ms_timer + 1;
               else state_nxt = S_END;
-              if( load == 1 ) state_nxt = S_END;
             end 
         end
         
