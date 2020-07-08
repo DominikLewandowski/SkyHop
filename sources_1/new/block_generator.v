@@ -31,56 +31,73 @@ module block_generator(
 );
 
   localparam S_START = 3'b000;
-  localparam S_L1 = 3'b001; 
-  localparam S_L2 = 3'b011; 
-  localparam S_L3 = 3'b010; 
-  localparam S_L4 = 3'b110; 
+  localparam S_LAYER_1 = 3'b001; 
+  localparam S_LAYER_2 = 3'b011; 
+  localparam S_LAYER_3 = 3'b010; 
+  localparam S_LAYER_4 = 3'b110;  
   localparam S_IDLE = 3'b111;
   localparam S_GENERATE = 3'b101; 
   
   reg [2:0] state, state_nxt = S_START;
-  reg load_layer_nxt, map_ready_nxt;
-
-  reg [0:6] layer_map_nxt, block_type_nxt; 
   
+  reg [0:6] block_type_nxt, layer_map_nxt; 
+  reg load_layer_nxt, map_ready_nxt;
+  
+  localparam LEFT = 1'b0, RIGHT = 1'b1;
+  reg direction, direction_nxt;
+    
   always @(*) begin
     state_nxt = state;
+    layer_map_nxt = layer_map;
+    block_type_nxt = block_type;
     load_layer_nxt = 0;
-    layer_map_nxt = 7'b0000000;
-    block_type_nxt = 7'b0000000;
     map_ready_nxt = 0;
     
     case(state)
-      S_START: if( generate_map == 1 ) state_nxt = S_L1;
-      S_L1: begin
-        layer_map_nxt = 7'b0001000; 
-        block_type_nxt = 7'b0000000;
+      S_START: 
+        if( generate_map == 1 ) state_nxt = S_LAYER_1;
+      
+      S_LAYER_1: begin
+        layer_map_nxt = 7'b0001000;
+        block_type_nxt = 7'b0001000;
         load_layer_nxt = 1;
-        state_nxt = S_L2;
+        state_nxt = S_LAYER_2;
       end
-      S_L2: begin
+      
+      S_LAYER_2: begin
         map_ready_nxt = 1;
-        layer_map_nxt = 7'b1010101; 
-        block_type_nxt = 7'b1000101;
+        layer_map_nxt = 7'b1010101;
+        block_type_nxt = 7'b0010000;
         load_layer_nxt = 1;
-        state_nxt = S_L3;
+        state_nxt = S_LAYER_3;
       end
-      S_L3: begin
-        layer_map_nxt = 7'b0101010; 
-        block_type_nxt = 7'b0001010;
+      
+      S_LAYER_3: begin
+        layer_map_nxt = layer_map ^ 7'b1111111;
+        block_type_nxt = 7'b0100000;
         load_layer_nxt = 1;
-        state_nxt = S_L4;
+        state_nxt = S_LAYER_4;
       end
-     S_L4: begin
-        layer_map_nxt = 7'b1010101; 
-        block_type_nxt = 7'b0010101;
+      
+      S_LAYER_4: begin
+        layer_map_nxt = layer_map ^ 7'b1111111;
+        block_type_nxt = 7'b1000000;
         load_layer_nxt = 1;
         map_ready_nxt = 1;
         state_nxt = S_IDLE;
       end
-      S_IDLE: state_nxt = S_IDLE;
+      
+      S_IDLE: 
+        if( generate_map == 1 ) state_nxt = S_GENERATE;
+      
+      S_GENERATE: begin
+        layer_map_nxt = layer_map ^ 7'b1111111;
+        block_type_nxt = 7'b0110000;
+        state_nxt = S_IDLE;
+      end
+        
+      default: state_nxt = S_IDLE; 
     endcase
-  
   end
   
   always @( posedge clk ) begin
@@ -88,8 +105,9 @@ module block_generator(
       state <= S_START;
       layer_map <= 7'b0000000;
       block_type <= 7'b0000000;
-      load_layer <= 0;
-      map_ready <= 0;
+      load_layer <= 1'b0;
+      map_ready <= 1'b0;
+      direction <= 1'b0;
     end 
     else begin
       state <= state_nxt;
@@ -97,6 +115,7 @@ module block_generator(
       block_type <= block_type_nxt;
       load_layer <= load_layer_nxt;
       map_ready <= map_ready_nxt;
+      direction <= direction_nxt;
     end
   end
   

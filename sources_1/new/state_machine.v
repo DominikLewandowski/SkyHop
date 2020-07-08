@@ -69,8 +69,8 @@ module state_machine (
       `S_START:        {outputs, next_state} = {12'b100000000000, (key == K_SPACEBAR) ? `S_PREPARE_MAP : `S_START};
       `S_PREPARE_MAP:  {outputs, next_state} = {12'b100000000001, map_ready ? `S_GAME_IDLE : `S_PREPARE_MAP};
       `S_GAME_IDLE:    {outputs, next_state} = {12'b011110100000, jump_fail ? `S_CHAR_FALL : (time_elapsed ? `S_GAME_END_T : ((key == K_LEFT) ? `S_JUMP_L : ((key == K_RIGHT) ? `S_JUMP_R : `S_GAME_IDLE)))};
-      `S_JUMP_L:       {outputs, next_state} = {12'b011110110100, `S_CHAR_FLY};
-      `S_JUMP_R:       {outputs, next_state} = {12'b011110101100, `S_CHAR_FLY};
+      `S_JUMP_L:       {outputs, next_state} = {12'b011110110101, `S_CHAR_FLY};
+      `S_JUMP_R:       {outputs, next_state} = {12'b011110101101, `S_CHAR_FLY};
       `S_CHAR_FLY:     {outputs, next_state} = {12'b011110100100, character_landed ? `S_GAME_IDLE : `S_CHAR_FLY};
       `S_CHAR_FALL:    {outputs, next_state} = {12'b011110100100, character_landed ? `S_GAME_END_F : `S_CHAR_FALL};
       `S_GAME_END_T:   {outputs, next_state} = {12'b000001000000, (key == K_SPACEBAR) ? `S_START : `S_GAME_END_T};

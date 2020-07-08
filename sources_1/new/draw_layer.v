@@ -87,49 +87,49 @@ module draw_layer
         && (((vcount_in+OFFSET_Y) >=  ypos) && ((vcount_in+OFFSET_Y) < (ypos + BLOCK_HEIGHT))) ) 
         begin 
           relative_x = hcount_in - (START_X+(0*BLOCK_WIDTH));    
-          if(layer_map[0] == 1 )  rect_type = (block_type[0] == 1) ? BLOCK_CLOUD : BLOCK_GROUND; 
+          if(layer_map[0] == 1 )  rect_type = (block_type[0] == 1) ? BLOCK_GROUND : BLOCK_CLOUD; 
           else rect_type = BLOCK_EMPTY; 
         end
       else if (((hcount_in >=  START_X+(1*BLOCK_WIDTH)) && (hcount_in < (START_X + (2*BLOCK_WIDTH)))) 
         && (((vcount_in+OFFSET_Y) >=  ypos) && ((vcount_in+OFFSET_Y) < (ypos + BLOCK_HEIGHT))) ) 
         begin 
           relative_x = hcount_in - (START_X+(1*BLOCK_WIDTH));      
-          if(layer_map[1] == 1 )  rect_type = (block_type[1] == 1) ? BLOCK_CLOUD : BLOCK_GROUND; 
+          if(layer_map[1] == 1 )  rect_type = (block_type[1] == 1) ? BLOCK_GROUND : BLOCK_CLOUD; 
           else rect_type = BLOCK_EMPTY;  
         end
       else if (((hcount_in >=  START_X+(2*BLOCK_WIDTH)) && (hcount_in < (START_X + (3*BLOCK_WIDTH)))) 
         && (((vcount_in+OFFSET_Y) >=  ypos) && ((vcount_in+OFFSET_Y) < (ypos + BLOCK_HEIGHT))) ) 
         begin 
           relative_x = hcount_in - (START_X+(2*BLOCK_WIDTH));      
-          if(layer_map[2] == 1 )  rect_type = (block_type[2] == 1) ? BLOCK_CLOUD : BLOCK_GROUND; 
+          if(layer_map[2] == 1 )  rect_type = (block_type[2] == 1) ? BLOCK_GROUND : BLOCK_CLOUD; 
           else rect_type = BLOCK_EMPTY;  
         end
       else if (((hcount_in >=  START_X+(3*BLOCK_WIDTH)) && (hcount_in < (START_X + (4*BLOCK_WIDTH)))) 
         && (((vcount_in+OFFSET_Y) >=  ypos) && ((vcount_in+OFFSET_Y) < (ypos + BLOCK_HEIGHT))) ) 
         begin 
           relative_x = hcount_in - (START_X+(3*BLOCK_WIDTH));      
-          if(layer_map[3] == 1 )  rect_type = (block_type[3] == 1) ? BLOCK_CLOUD : BLOCK_GROUND; 
+          if(layer_map[3] == 1 )  rect_type = (block_type[3] == 1) ? BLOCK_GROUND : BLOCK_CLOUD; 
           else rect_type = BLOCK_EMPTY;  
         end
       else if (((hcount_in >=  START_X+(4*BLOCK_WIDTH)) && (hcount_in < (START_X + (5*BLOCK_WIDTH)))) 
         && (((vcount_in+OFFSET_Y) >=  ypos) && ((vcount_in+OFFSET_Y) < (ypos + BLOCK_HEIGHT))) ) 
         begin 
           relative_x = hcount_in - (START_X+(4*BLOCK_WIDTH));      
-          if(layer_map[4] == 1 )  rect_type = (block_type[4] == 1) ? BLOCK_CLOUD : BLOCK_GROUND; 
+          if(layer_map[4] == 1 )  rect_type = (block_type[4] == 1) ? BLOCK_GROUND : BLOCK_CLOUD; 
           else rect_type = BLOCK_EMPTY;   
         end
       else if (((hcount_in >=  START_X+(5*BLOCK_WIDTH)) && (hcount_in < (START_X + (6*BLOCK_WIDTH)))) 
         && (((vcount_in+OFFSET_Y) >=  ypos) && ((vcount_in+OFFSET_Y) < (ypos + BLOCK_HEIGHT))) ) 
         begin 
           relative_x = hcount_in - (START_X+(5*BLOCK_WIDTH));      
-          if(layer_map[5] == 1 )  rect_type = (block_type[5] == 1) ? BLOCK_CLOUD : BLOCK_GROUND; 
+          if(layer_map[5] == 1 )  rect_type = (block_type[5] == 1) ? BLOCK_GROUND : BLOCK_CLOUD; 
           else rect_type = BLOCK_EMPTY;  
         end
       else if (((hcount_in >=  START_X+(6*BLOCK_WIDTH)) && (hcount_in < (START_X + (7*BLOCK_WIDTH)))) 
         && (((vcount_in+OFFSET_Y) >=  ypos) && ((vcount_in+OFFSET_Y) < (ypos + BLOCK_HEIGHT))) ) 
         begin 
           relative_x = hcount_in - (START_X+(6*BLOCK_WIDTH));      
-          if(layer_map[6] == 1 )  rect_type = (block_type[6] == 1) ? BLOCK_CLOUD : BLOCK_GROUND; 
+          if(layer_map[6] == 1 )  rect_type = (block_type[6] == 1) ? BLOCK_GROUND : BLOCK_CLOUD; 
           else rect_type = BLOCK_EMPTY;  
         end
       else 
