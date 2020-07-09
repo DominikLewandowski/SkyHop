@@ -41,8 +41,12 @@ module blocks(
   wire [0:6] layer_map [NUM_MODULES:0];
   wire [0:6] block_type [NUM_MODULES:0];
   
-  assign layer_map[0] = layer_map_in;
-  assign block_type[0] = block_type_in;
+  reg [0:6] layer_map_latched, layer_map_latched_nxt;
+  reg [0:6] block_type_latched, block_type_latched_nxt;
+  reg load_layer_delayed, load_layer_delayed_nxt;     
+
+  assign layer_map[0] = layer_map_latched;    
+  assign block_type[0] = block_type_latched;
   
   assign vga_bus[0] = vga_bus_in;
   assign vga_bus_out = vga_bus[NUM_MODULES];
@@ -56,7 +60,7 @@ module blocks(
         .module_en(module_en),
         .one_ms_tick(one_ms_tick),
         .start(jump_left | jump_right),
-        .load(load_layer),
+        .load(load_layer_delayed),
         .layer_map_in(layer_map[i]),
         .block_type_in(block_type[i]),
         .vga_bus_in(vga_bus[i]),
@@ -74,15 +78,34 @@ module blocks(
   begin
     jump_fail_nxt = jump_fail;
     character_pos_nxt = character_pos;
+    layer_map_latched_nxt = layer_map_latched;	
+    block_type_latched_nxt =  block_type_latched;    
+    load_layer_delayed_nxt = 0;    
+
+    if(load_layer) begin    
+      layer_map_latched_nxt = layer_map_in;    
+      block_type_latched_nxt =  block_type_in;    
+      load_layer_delayed_nxt = 1;    
+    end
     
     if(jump_left) begin
+      layer_map_latched_nxt = layer_map_in;	
+      block_type_latched_nxt =  block_type_in;
       character_pos_nxt = character_pos - 1;
       if( (layer_map[3][character_pos-3] == 1) && (block_type[3][character_pos-3] == 0) ) jump_fail_nxt = 1;
     end
     else if(jump_right) begin
+      layer_map_latched_nxt = layer_map_in;	
+      block_type_latched_nxt =  block_type_in;
       character_pos_nxt = character_pos + 1;
       if( (layer_map[3][character_pos-1] == 1) && (block_type[3][character_pos-1] == 0) ) jump_fail_nxt = 1;
     end
+  end
+  
+  always @( posedge clk ) begin	
+    layer_map_latched <= layer_map_latched_nxt;    
+    block_type_latched <= block_type_latched_nxt;    
+    load_layer_delayed <= load_layer_delayed_nxt;    
   end
   
   always @( posedge clk )
