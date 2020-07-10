@@ -92,13 +92,15 @@ module blocks(
       layer_map_latched_nxt = layer_map_in;	
       block_type_latched_nxt =  block_type_in;
       character_pos_nxt = character_pos - 1;
-      if( (layer_map[3][character_pos-3] == 1) && (block_type[3][character_pos-3] == 0) ) jump_fail_nxt = 1;
+      if( layer_map[3][character_pos-3] == 0) jump_fail_nxt = 1;
+      else if( block_type[3][character_pos-3] == 0 ) jump_fail_nxt = 1;
     end
     else if(jump_right) begin
       layer_map_latched_nxt = layer_map_in;	
       block_type_latched_nxt =  block_type_in;
       character_pos_nxt = character_pos + 1;
-      if( (layer_map[3][character_pos-1] == 1) && (block_type[3][character_pos-1] == 0) ) jump_fail_nxt = 1;
+      if( layer_map[3][character_pos-1] == 0) jump_fail_nxt = 1;
+      else if( block_type[3][character_pos-1] == 0 ) jump_fail_nxt = 1;
     end
   end
   
