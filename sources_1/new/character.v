@@ -49,12 +49,16 @@ module character(
   localparam CHARACTER_POS_X = (`GAME_WIDTH / 2) - (CHARACTER_WIDTH / 2) - 1;
   localparam CHARACTER_POS_Y = 625 - 100 - CHARACTER_HEIGHT - SPACE_BLOCK_CHAR;
   
-  wire [11:0] rgb_char_f_rom, rgb_char_s_rom;
+  localparam CHAR_LEFT = 2'b00;
+  localparam CHAR_RIGHT = 2'b01;
+  localparam CHAR_FRONT = 2'b10;
+  
+  wire [11:0] rgb_char_front, rgb_char_side;
   wire [13:0] pixel_addres_rom;
-
-  reg fly_flag, fly_flag_nxt;
-  reg char_mirror, char_mirror_nxt;
-  wire [11:0] rgb_pixel = (fly_flag == 1) ? rgb_char_s_rom : rgb_char_f_rom;
+  reg [1:0] charcter_view, charcter_view_nxt;
+  
+  wire char_mirror = ( charcter_view == CHAR_RIGHT ) ? 1'b0 : 1'b1;
+  wire [11:0] rgb_pixel = (charcter_view == CHAR_FRONT) ? rgb_char_front : rgb_char_side;
   
   draw_rect_img #(
     .RECT_WIDTH(CHARACTER_WIDTH),
@@ -74,13 +78,13 @@ module character(
   
   img_char_f_rom my_char_f_rom (  
     .address(pixel_addres_rom),
-    .rgb(rgb_char_f_rom),
+    .rgb(rgb_char_front),
     .clk(clk)
   );
   
   img_char_s_rom my_char_s_rom (  
     .address(pixel_addres_rom),
-    .rgb(rgb_char_s_rom),
+    .rgb(rgb_char_side),
     .clk(clk)
   );
   
@@ -99,35 +103,45 @@ module character(
   localparam S_JUMP_L = 2'b10;
   localparam S_FALL   = 2'b11;
   
-  reg [7:0] timer, timer_nxt;
+  reg [7:0] counter, counter_nxt;
   
   always @(*)
   begin
     state_nxt = state;
     character_y_nxt = character_y;
     character_x_nxt = character_x;
-    timer_nxt = timer;
-    fly_flag_nxt = fly_flag;
-    char_mirror_nxt = char_mirror;
+    charcter_view_nxt = charcter_view;
+    counter_nxt = counter;
     landed_nxt = 0;
     
     case( state )
     
       S_IDLE:
       begin 
-        state_nxt = jump_fail ? S_FALL : (jump_left ? S_JUMP_L : (jump_right ? S_JUMP_R : state));
-        timer_nxt = 0;
-        fly_flag_nxt = 0;
+        if( jump_fail ) begin
+          state_nxt = S_FALL;
+          counter_nxt = 0;
+        end  
+        else if( jump_left ) begin
+          state_nxt = S_JUMP_L;
+          charcter_view_nxt = CHAR_LEFT;
+          counter_nxt = 0;
+        end
+        else if( jump_right ) begin
+          state_nxt = S_JUMP_R;
+          charcter_view_nxt = CHAR_RIGHT;
+          counter_nxt = 0;
+        end
+        else charcter_view_nxt = CHAR_FRONT; 
       end
         
       S_JUMP_R:
         if( movement_tick == 1 )
           begin
-            char_mirror_nxt = 0;
-            fly_flag_nxt = 1;
+            charcter_view_nxt = CHAR_RIGHT;
             character_x_nxt = character_x + 1;
-            character_y_nxt = (timer < 40) ? character_y - 2 : character_y + 2;
-            if( timer < 79 ) timer_nxt = timer + 1;
+            character_y_nxt = (counter < 40) ? character_y - 2 : character_y + 2;
+            if( counter < 79 ) counter_nxt = counter + 1;
             else 
               begin
                 landed_nxt = 1;
@@ -138,11 +152,10 @@ module character(
       S_JUMP_L:
         if( movement_tick == 1 )
           begin
-            char_mirror_nxt = 1;
-            fly_flag_nxt = 1;
+            charcter_view_nxt = CHAR_LEFT;
             character_x_nxt = character_x - 1;
-            character_y_nxt = (timer < 40) ? character_y - 2 : character_y + 2;
-            if( timer < 79 ) timer_nxt = timer + 1;
+            character_y_nxt = (counter < 40) ? character_y - 2 : character_y + 2;
+            if( counter < 79 ) counter_nxt = counter + 1;
             else 
               begin
                 landed_nxt = 1;
@@ -150,18 +163,20 @@ module character(
               end
           end  
      
-       S_FALL:
+       S_FALL: begin
          if( movement_tick == 1 )
            begin
-             fly_flag_nxt = 1;
-             character_y_nxt = character_y + 1;
-             if( timer < 200 ) timer_nxt = timer + 1;
-             else 
-               begin
-                 landed_nxt = 1;
-                 state_nxt = S_IDLE;
-               end
-            end  
+             if( character_y < (`GAME_HEIGHT + 350) ) begin
+               counter_nxt = counter + 1;
+               character_x_nxt = ( charcter_view == CHAR_LEFT ) ? (character_x - 1) : (character_x + 1);
+               character_y_nxt = character_y + 2**counter[7:2];    
+             end
+             else begin
+               landed_nxt = 1;
+               state_nxt = S_IDLE;
+             end
+           end  
+         end
 
       default: state_nxt = S_IDLE;
     endcase
@@ -173,17 +188,15 @@ module character(
       character_y <= CHARACTER_POS_Y;
       state <= S_IDLE;
       landed <= 0;
-      timer <= 0;
-      fly_flag <= 0;
-      char_mirror <= 0;
+      counter <= 0;
+      charcter_view <= CHAR_FRONT;
     end
     else begin
       character_x <= character_x_nxt;
       character_y <= character_y_nxt;
       state <= state_nxt;
       landed <= landed_nxt;
-      timer <= timer_nxt;
-      fly_flag <= fly_flag_nxt;
-      char_mirror <= char_mirror_nxt;
+      counter <= counter_nxt;
+      charcter_view <= charcter_view_nxt;
     end    
 endmodule
