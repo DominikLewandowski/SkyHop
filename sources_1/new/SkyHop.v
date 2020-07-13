@@ -29,15 +29,13 @@ module SkyHop(
   output wire [3:0] r, g, b
   );
   
-  wire locked;
-  wire clk_100MHz;
   wire clk_40MHz;
+  wire clk_50MHz;
   
   clk_wiz_0 clk_config (
-    .clk100MHz(clk_100MHz),  // Clock out ports
-    .clk40MHz(clk_40MHz),
+    .clk40MHz(clk_40MHz),  // Clock out ports
+    .clk50MHz(clk_50MHz),
     .reset(1'b0),            // Status and control signals
-    .locked(locked),
     .clk(clk)                // Clock in ports
   );
   
