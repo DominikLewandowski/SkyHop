@@ -23,7 +23,8 @@
 module SkyHop(
   input wire rst,
   input wire clk,
-  input wire btnU, btnL, btnR,
+  input wire PS2Data,
+  input wire PS2Clk,
   output wire vs,
   output wire hs,
   output wire [3:0] r, g, b
@@ -60,12 +61,12 @@ module SkyHop(
 
   wire [1:0] key_code;
   keyboard my_keyboard(
-    .clk(clk_40MHz),
+    .clk_40MHz(clk_40MHz),
+    .clk_50MHz(clk_50MHz),
     .rst(rst),
-    .btnU(btnU),
-    .btnL(btnL),
-    .btnR(btnR),
-    .key_code(key_code)
+    .PS2Data(PS2Data),
+    .PS2Clk(PS2Clk),
+    .key(key_code)
    );
 
   state_machine FSM (
