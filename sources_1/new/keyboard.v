@@ -21,7 +21,6 @@
 
 
 module keyboard (
-  input wire clk_40MHz,
   input wire clk_50MHz,
   input wire rst,
   input wire PS2Data,
@@ -29,16 +28,15 @@ module keyboard (
   output reg [1:0] key
  );
  
-  reg  [1:0]  key_nxt = 0;
+ localparam SPACEBAR_CODE = 8'h29;
+ localparam L_ARROW_CODE  = 8'h6B;
+ localparam R_ARROW_CODE  = 8'h74;
+ 
+  reg   [1:0] key_nxt;
+  reg         start, start_nxt = 0;
   reg  [15:0] keycodev, keycodev_nxt = 0;
-
   wire [15:0] keycode;
-  wire [15:0] keycode_latched_nxt = keycode;
-  reg [15:0] keycode_latched;
-  
-  wire flag;
-  wire flag_latched_nxt = flag;
-  reg flag_latched;
+  wire        flag;
   
   PS2Receiver uut (
     .clk(clk_50MHz),
@@ -48,36 +46,63 @@ module keyboard (
     .oflag(flag)
   );
   
-  always @( posedge clk_40MHz ) begin
-    keycode_latched <= keycode_latched_nxt;
-    flag_latched <= flag_latched_nxt;
+  always@(*)
+    if (keycode[7:0] == 8'hf0) begin
+      start_nxt = 1'b0;
+      keycodev_nxt = keycodev;
+    end else if (keycode[15:8] == 8'hf0) begin
+      start_nxt = 1'b0;
+      keycodev_nxt = (flag == 1'b1 && (keycode != keycodev) ) ? keycode : keycodev;
+    end else begin
+      start_nxt = (flag == 1'b1 && (keycode[7:0] != keycodev[7:0] || keycodev[15:8] == 8'hf0) ) ? 1'b1 : 1'b0;
+      keycodev_nxt = (flag == 1'b1 && (keycode[7:0] != keycodev[7:0] || keycodev[15:8] == 8'hf0) ) ? keycode : keycodev;
+    end
+
+  always@(posedge clk_50MHz) begin
+    start <= start_nxt;
+    keycodev <= keycodev_nxt;
   end
   
-  always @(*) begin
-    key_nxt = 2'b00;
-    keycodev_nxt = keycodev;
-    
-    if ( (keycode[7:0] != 8'hf0) && (keycode[15:8] != 8'hf0) ) 
-    begin
-      if( (flag_latched == 1'b1) && (keycode_latched[7:0] != keycodev[7:0] || keycodev[15:8]) ) 
-      begin
-        keycodev_nxt = keycode_latched;
-        if( keycode_latched[7:0] == 8'h29 ) key_nxt = 2'b11;
-        else if( keycode_latched[7:0] == 8'h6B ) key_nxt = 2'b01;
-        else if( keycode_latched[7:0] == 8'h74 ) key_nxt = 2'b10;
-      end
-    end
-  end
-
-  always@( posedge clk_40MHz ) begin
+  reg delay_flag, delay_flag_nxt = 1'b0;
+  
+  always@(*) 
+   if( delay_flag != 1'b0 ) begin
+     key_nxt = key;
+     delay_flag_nxt = delay_flag - 1;
+   end 
+   else if( start == 1'b1 ) 
+     case( keycodev[7:0] )
+       SPACEBAR_CODE: begin
+         key_nxt = `K_SPACEBAR;
+         delay_flag_nxt = 1'b1;
+       end
+       L_ARROW_CODE: begin
+         key_nxt = `K_LEFT;
+         delay_flag_nxt = 1'b1;
+       end
+       R_ARROW_CODE: begin
+         key_nxt = `K_RIGHT;
+         delay_flag_nxt = 1'b1;
+       end
+       default: begin
+         key_nxt = `K_NULL;
+         delay_flag_nxt = 1'b0;
+       end
+     endcase
+   else begin
+     key_nxt = `K_NULL;
+     delay_flag_nxt = 1'b0;
+   end
+  
+  always@(posedge clk_50MHz) begin
     if(rst) begin
-      key <= 2'b00;
-      keycodev <= 16'h0000;
+      key <= `K_NULL;
+      delay_flag <= 1'b0;
     end
     else begin
       key <= key_nxt;
-      keycodev <= keycodev_nxt;
-    end
+      delay_flag <= delay_flag_nxt;
+    end  
   end
           
 endmodule

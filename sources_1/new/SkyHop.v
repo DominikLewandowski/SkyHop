@@ -61,7 +61,6 @@ module SkyHop(
 
   wire [1:0] key_code;
   keyboard my_keyboard(
-    .clk_40MHz(clk_40MHz),
     .clk_50MHz(clk_50MHz),
     .rst(rst),
     .PS2Data(PS2Data),

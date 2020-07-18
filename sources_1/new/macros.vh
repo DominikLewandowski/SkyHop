@@ -4,6 +4,12 @@
 `define GAME_WIDTH 800
 `define GAME_HEIGHT 600
 
+// ------ KEYBOARD ------ //
+`define K_NULL 2'b00
+`define K_LEFT 2'b01
+`define K_RIGHT 2'b10
+`define K_SPACEBAR 2'b11
+
 // ------ DRAW BACKGROUND ------ //
 `define BG_COLOR_L 12'h5_9_F
 `define BG_COLOR_D 12'h3_7_F

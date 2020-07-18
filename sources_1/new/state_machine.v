@@ -53,10 +53,6 @@ module state_machine (
   output wire layer_generate
   );
   
-  localparam K_LEFT     = 2'b01;  // Left arrow
-  localparam K_RIGHT    = 2'b10;  // Right arrow
-  localparam K_SPACEBAR = 2'b11;  // Spacebar
-  
   reg [11:0] outputs;
   assign {start_screen_en, blocks_en, time_bar_en, character_en, points_en, end_screen_en, bg_clor_select, jump_left, jump_right, timer_start, end_text_select, layer_generate} = outputs[11:0];
   
@@ -66,15 +62,15 @@ module state_machine (
   
   always @* begin
     case (state)
-      `S_START:        {outputs, next_state} = {12'b100000000000, (key == K_SPACEBAR) ? `S_PREPARE_MAP : `S_START};
+      `S_START:        {outputs, next_state} = {12'b100000000000, (key == `K_SPACEBAR) ? `S_PREPARE_MAP : `S_START};
       `S_PREPARE_MAP:  {outputs, next_state} = {12'b100000000001, map_ready ? `S_GAME_IDLE : `S_PREPARE_MAP};
-      `S_GAME_IDLE:    {outputs, next_state} = {12'b011110100000, jump_fail ? `S_CHAR_FALL : (time_elapsed ? `S_GAME_END_T : ((key == K_LEFT) ? `S_JUMP_L : ((key == K_RIGHT) ? `S_JUMP_R : `S_GAME_IDLE)))};
+      `S_GAME_IDLE:    {outputs, next_state} = {12'b011110100000, jump_fail ? `S_CHAR_FALL : (time_elapsed ? `S_GAME_END_T : ((key == `K_LEFT) ? `S_JUMP_L : ((key == `K_RIGHT) ? `S_JUMP_R : `S_GAME_IDLE)))};
       `S_JUMP_L:       {outputs, next_state} = {12'b011110110101, `S_CHAR_FLY};
       `S_JUMP_R:       {outputs, next_state} = {12'b011110101101, `S_CHAR_FLY};
       `S_CHAR_FLY:     {outputs, next_state} = {12'b011110100100, character_landed ? `S_GAME_IDLE : `S_CHAR_FLY};
       `S_CHAR_FALL:    {outputs, next_state} = {12'b011110100100, character_landed ? `S_GAME_END_F : `S_CHAR_FALL};
-      `S_GAME_END_T:   {outputs, next_state} = {12'b000001000000, (key == K_SPACEBAR) ? `S_START : `S_GAME_END_T};
-      `S_GAME_END_F:   {outputs, next_state} = {12'b000001000010, (key == K_SPACEBAR) ? `S_START : `S_GAME_END_F};
+      `S_GAME_END_T:   {outputs, next_state} = {12'b000001000000, (key == `K_SPACEBAR) ? `S_START : `S_GAME_END_T};
+      `S_GAME_END_F:   {outputs, next_state} = {12'b000001000010, (key == `K_SPACEBAR) ? `S_START : `S_GAME_END_F};
       default:         {outputs, next_state} = {12'b100000000000, `S_START};
     endcase
   end
