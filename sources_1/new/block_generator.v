@@ -26,6 +26,7 @@ module block_generator(
   input wire generate_map,
   output reg [0:6] layer_map,
   output wire [0:6] block_type,
+  output reg [0:6] bonus_map,
   output reg load_layer,
   output reg map_ready
 );
@@ -40,6 +41,8 @@ module block_generator(
   
   localparam LEFT = 1'b0, RIGHT = 1'b1;
   localparam SEED = 32'd987654321;
+  
+  localparam BONUS_PERIOD = 4'b1111;
   
   reg [31:0] z1, z2, z3, z4;
   reg [31:0] z1_nxt=SEED, z2_nxt=SEED, z3_nxt=SEED, z4_nxt=SEED;
@@ -57,6 +60,9 @@ module block_generator(
   wire direction_second_nxt = ( ^pseudo_number[15:0] == 1'b0 ) ? LEFT : RIGHT;
   
   assign block_type = main_track | second_track;
+  
+  reg [3:0] bonus_counter, bonus_counter_nxt;
+  reg [0:6] bonus_map_nxt;
     
   always @(*) begin
     state_nxt = state;
@@ -67,6 +73,8 @@ module block_generator(
     load_layer_nxt = 0;
     map_ready_nxt = 0;
     track_en_nxt = track_en;
+    bonus_counter_nxt = bonus_counter;
+    bonus_map_nxt = bonus_map;
     
     case(state)
       S_START: 
@@ -100,6 +108,7 @@ module block_generator(
         map_ready_nxt = 1;
         block_counter_nxt = 0;
         track_en_nxt = 0;
+        bonus_counter_nxt = 0;
         state_nxt = S_IDLE;
       end
       
@@ -107,17 +116,23 @@ module block_generator(
         if( generate_map == 1 ) state_nxt = S_GENERATE;
       
       S_GENERATE: begin
+        bonus_counter_nxt = bonus_counter + 1;
+        bonus_map_nxt = 7'b0;
+        
         layer_map_nxt = layer_map ^ 7'b1111111;
         if( main_track == 7'b1000000 ) begin
           main_track_nxt = main_track >> 1;
+          if(bonus_counter == BONUS_PERIOD ) bonus_map_nxt = main_track >> 1;
           second_track_nxt = ( track_en == 1 ) ? second_track : (main_track >> 1);
         end
         else if( main_track == 7'b0000001 ) begin
           main_track_nxt = main_track << 1;
+          if(bonus_counter == BONUS_PERIOD ) bonus_map_nxt = main_track << 1;
           second_track_nxt = ( track_en == 1 ) ? second_track : (main_track << 1);
         end  
         else begin
           main_track_nxt = ( direction_main == LEFT ) ? ( main_track << 1 ) : ( main_track >> 1 );
+          if(bonus_counter == BONUS_PERIOD ) bonus_map_nxt = ( direction_main == LEFT ) ? ( main_track << 1 ) : ( main_track >> 1 );
           second_track_nxt = ( track_en == 1 ) ? second_track : (( direction_main == LEFT ) ? ( main_track << 1 ) : ( main_track >> 1 ));
         end  
         
@@ -155,6 +170,8 @@ module block_generator(
       direction_second <= 1'b0;
       block_counter <= 4'b0;
       track_en <= 1'b0;
+      bonus_counter <= 4'b0;
+      bonus_map <= 7'b0;
     end 
     else begin
       state <= state_nxt;
@@ -167,6 +184,8 @@ module block_generator(
       direction_second <= direction_second_nxt;
       block_counter <= block_counter_nxt;
       track_en <= track_en_nxt;
+      bonus_counter <= bonus_counter_nxt;
+      bonus_map <= bonus_map_nxt;
     end
   end
   

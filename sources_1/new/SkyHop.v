@@ -129,12 +129,13 @@ module SkyHop(
     .clk(clk_40MHz)
   );
   
-  wire [0:6] layer_map, block_type;
+  wire [0:6] layer_map, block_type, bonus_map;
   wire load_layer;
   block_generator block_gen (
     .generate_map(layer_generate),
     .layer_map(layer_map),
     .block_type(block_type),
+    .bonus_map(bonus_map),
     .load_layer(load_layer),
     .map_ready(map_ready),
     .rst(rst | end_screen_en),
@@ -149,6 +150,7 @@ module SkyHop(
     .load_layer(load_layer),
     .layer_map_in(layer_map),
     .block_type_in(block_type),
+    .bonus_map_in(bonus_map),
     .vga_bus_in(vga_bus[1]),
     .vga_bus_out(vga_bus[2]),
     .jump_fail(jump_fail),

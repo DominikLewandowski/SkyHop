@@ -31,10 +31,12 @@ module shift_layer #(parameter POS_Y = 0)
   input wire load,
   input wire [0:6] layer_map_in,
   input wire [0:6] block_type_in,
+  input wire [0:6] bonus_map_in,
   input wire [`VGA_BUS_SIZE-1:0] vga_bus_in,
   output wire [`VGA_BUS_SIZE-1:0] vga_bus_out,
   output reg [0:6] layer_map_out,
-  output reg [0:6] block_type_out
+  output reg [0:6] block_type_out,
+  output reg [0:6] bonus_map_out
  );
     
   wire [11:0] rgb_ground_rom, rgb_cloud_rom;
@@ -44,6 +46,7 @@ module shift_layer #(parameter POS_Y = 0)
   reg [7:0] one_ms_timer, one_ms_timer_nxt;
   reg [0:6] layer_map_out_nxt;
   reg [0:6] block_type_out_nxt;
+  reg [0:6] bonus_map_out_nxt;
   
   wire [11:0] y_offset = (POS_Y==0) ? 12'd25 :
                          (POS_Y==1) ? 12'd175 :
@@ -58,6 +61,7 @@ module shift_layer #(parameter POS_Y = 0)
     .module_en(module_en),
     .layer_map(layer_map_in),
     .block_type(block_type_in),
+    .bonus_map(bonus_map_in),
     .rgb_pixel_ground(rgb_ground_rom),
     .rgb_pixel_cloud(rgb_cloud_rom),
     .ypos((shift_y + y_offset)),
@@ -88,6 +92,7 @@ module shift_layer #(parameter POS_Y = 0)
   begin
     layer_map_out_nxt = layer_map_out;
     block_type_out_nxt = block_type_out;
+    bonus_map_out_nxt = bonus_map_out;
     state_nxt = state;
     one_ms_timer_nxt = one_ms_timer;
     shift_y_nxt = shift_y;
@@ -98,6 +103,7 @@ module shift_layer #(parameter POS_Y = 0)
         if( load == 1 ) begin
           layer_map_out_nxt = layer_map_in;
           block_type_out_nxt = block_type_in;
+          bonus_map_out_nxt = bonus_map_in;
         end 
         else if( start == 1 ) 
           begin
@@ -121,6 +127,7 @@ module shift_layer #(parameter POS_Y = 0)
           shift_y_nxt = 0;
           layer_map_out_nxt = layer_map_in;
           block_type_out_nxt = block_type_in;
+          bonus_map_out_nxt = bonus_map_in;
           state_nxt = S_IDLE;
         end
         
@@ -130,15 +137,17 @@ module shift_layer #(parameter POS_Y = 0)
   
   always @( posedge clk )
     if(rst) begin
-      layer_map_out <= 0;
-      block_type_out <= 0;
-      one_ms_timer <= 0;
-      shift_y <= 0;
+      layer_map_out <= 7'b0;
+      block_type_out <= 7'b0;
+      bonus_map_out <= 7'b0;
+      one_ms_timer <= 8'b0;
+      shift_y <= 8'b0;
       state <= S_IDLE;
     end
     else begin
       layer_map_out <= layer_map_out_nxt;
       block_type_out <= block_type_out_nxt;
+      bonus_map_out <= bonus_map_out_nxt;
       one_ms_timer <= one_ms_timer_nxt;
       shift_y <= shift_y_nxt;
       state <= state_nxt;
