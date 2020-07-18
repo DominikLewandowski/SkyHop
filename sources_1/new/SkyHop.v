@@ -25,6 +25,7 @@ module SkyHop(
   input wire clk,
   input wire PS2Data,
   input wire PS2Clk,
+  input wire btnD,
   output wire vs,
   output wire hs,
   output wire [3:0] r, g, b
@@ -171,6 +172,7 @@ module SkyHop(
     .module_en(time_bar_en),
     .one_ms_tick(one_ms_tick),
     .start(timer_start),
+    .bonus(btnD),
     .vga_bus_in(vga_bus[3]),
     .vga_bus_out(vga_bus[4]),
     .elapsed(time_elapsed),
