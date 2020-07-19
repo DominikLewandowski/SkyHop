@@ -161,7 +161,7 @@ module time_bar(
       S_STOP:
         begin
           elapsed_nxt = 1'b1;    
-          state_nxt = S_IDLE;
+          if( module_en == 0 ) state_nxt = S_IDLE;
         end
         
       default: state_nxt = S_IDLE;
