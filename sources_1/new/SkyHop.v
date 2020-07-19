@@ -25,7 +25,6 @@ module SkyHop(
   input wire clk,
   input wire PS2Data,
   input wire PS2Clk,
-  input wire btnD,
   output wire vs,
   output wire hs,
   output wire [3:0] r, g, b
@@ -142,6 +141,7 @@ module SkyHop(
     .clk(clk_40MHz)
   );
   
+  wire bonus;
   blocks my_blocks (
     .one_ms_tick(one_ms_tick),
     .module_en(blocks_en),
@@ -154,6 +154,7 @@ module SkyHop(
     .vga_bus_in(vga_bus[1]),
     .vga_bus_out(vga_bus[2]),
     .jump_fail(jump_fail),
+    .bonus(bonus),
     .rst(rst),
     .clk(clk_40MHz)
   );
@@ -174,7 +175,7 @@ module SkyHop(
     .module_en(time_bar_en),
     .one_ms_tick(one_ms_tick),
     .start(timer_start),
-    .bonus(btnD),
+    .bonus(bonus & character_landed),
     .vga_bus_in(vga_bus[3]),
     .vga_bus_out(vga_bus[4]),
     .elapsed(time_elapsed),
