@@ -38,7 +38,7 @@ module shift_layer #(parameter POS_Y = 0)
   output reg [0:6] block_type_out,
   output reg [0:6] bonus_map_out
  );
-    
+   
   wire [11:0] rgb_ground_rom, rgb_cloud_rom;
   wire [13:0] pixel_addres_rom;
   
@@ -48,11 +48,11 @@ module shift_layer #(parameter POS_Y = 0)
   reg [0:6] block_type_out_nxt;
   reg [0:6] bonus_map_out_nxt;
   
-  wire [11:0] y_offset = (POS_Y==0) ? 12'd25 :
-                         (POS_Y==1) ? 12'd175 :
-                         (POS_Y==2) ? 12'd325 :
-                         (POS_Y==3) ? 12'd475 :
-                         (POS_Y==4) ? 12'd625 : 12'd0;
+  wire [11:0] y_offset = (POS_Y==0) ? 12'd0 :
+                         (POS_Y==1) ? 12'd150 :
+                         (POS_Y==2) ? 12'd300 :
+                         (POS_Y==3) ? 12'd450 :
+                         (POS_Y==4) ? 12'd600 : 12'd0;
   
   draw_layer my_draw_layer
   (

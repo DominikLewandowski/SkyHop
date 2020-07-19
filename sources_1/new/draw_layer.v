@@ -37,7 +37,7 @@ module draw_layer
 );
   localparam SCREEN_WIDTH = 800;
   localparam BLOCK_WIDTH = 80;
-  localparam BLOCK_HEIGHT = 25;
+  localparam BLOCK_HEIGHT = 50;
   
   localparam BLOCKS_N = 7;
   localparam OFFSET_Y = 100;
@@ -77,11 +77,12 @@ module draw_layer
     if(module_en == 0) 
       rgb_out_nxt = rgb_in_delayed;
     else if(rect_type_delayed == BLOCK_GROUND)
-      rgb_out_nxt = (rgb_pixel_ground == 12'hFFF) ? rgb_in_delayed : rgb_pixel_ground;
+      if(((vcount_out_nxt+OFFSET_Y) >=  ypos) && ((vcount_out_nxt+OFFSET_Y) < (ypos + BLOCK_HEIGHT/2))) rgb_out_nxt = rgb_in_delayed;
+      else rgb_out_nxt = (rgb_pixel_ground == 12'hFFF) ? rgb_in_delayed : rgb_pixel_ground;
     else if(rect_type_delayed == BLOCK_CLOUD)
       rgb_out_nxt = (rgb_pixel_cloud == 12'hFFF) ? rgb_in_delayed : rgb_pixel_cloud;
     else if(rect_type_delayed == BLOCK_BONUS)
-      rgb_out_nxt = 12'hF00;
+      rgb_out_nxt = (rgb_pixel_ground == 12'hFFF) ? rgb_in_delayed : rgb_pixel_ground;
     else rgb_out_nxt = rgb_in_delayed;
       
   always @*
